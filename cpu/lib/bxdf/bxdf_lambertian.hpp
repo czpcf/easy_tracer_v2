@@ -6,14 +6,14 @@
 class BxdfLambertian: Bxdf {
 public:
     BxdfLambertian();
-    BxdfLambertian(float n);
+    BxdfLambertian(const Vec3 &n);
     ~BxdfLambertian() override = default;
 
     /// @brief return phase function(in, out, normal)
-    float phase(const Vec3 &dir_in, const Vec3 &dir_out, const Vec3 &norm) override;
+    Vec3 phase(const Vec3 &dir_in, const Vec3 &dir_out, const Vec3 &norm) override;
 
 private:
-    float alpha;
+    Vec3 alpha;
 };
 
 #endif

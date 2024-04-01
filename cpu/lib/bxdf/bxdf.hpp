@@ -14,7 +14,7 @@ public:
     virtual ~Bxdf() = default;
 
     /// @brief return phase function(in, out, normal)
-    virtual float phase(const Vec3 &dir_in, const Vec3 &dir_out, const Vec3 &norm);
+    virtual Vec3 phase(const Vec3 &dir_in, const Vec3 &dir_out, const Vec3 &norm);
 };
 
 #endif

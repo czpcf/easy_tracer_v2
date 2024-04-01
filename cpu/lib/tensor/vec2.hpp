@@ -49,4 +49,14 @@ public:
     float square();
 };
 
+class UV {
+public:
+    float x;
+    float y;
+    UV();
+    ~UV();
+    UV(float a, float b): x(a), y(b){}
+    UV(const Vec2 &a): x(a.x), y(a.y){}
+};
+
 #endif

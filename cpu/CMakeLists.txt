@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fopenmp -Wall")
 
 set(SOURCE_FILES
+    lib/accel/accel.cpp
     lib/accel/box.cpp
     lib/bxdf/bxdf.cpp
     lib/bxdf/bxdf_lambertian.cpp
@@ -18,7 +19,8 @@ set(SOURCE_FILES
     lib/random/random_mt19937.cpp
     lib/ray/ray.cpp
     lib/ray/ray_hit.cpp
-    lib/resource/resource_group.cpp
+    lib/resource/resource.cpp
+    lib/resource/resource_mesh.cpp
     lib/sampler/onb
     lib/sampler/sampler_lambertian.cpp
     lib/sampler/sampler_reflection.cpp
@@ -28,6 +30,8 @@ set(SOURCE_FILES
     lib/tensor/vec2.cpp
     lib/tensor/vec3.cpp
     lib/tensor/vec4.cpp
+    lib/texture/texture_simple.cpp
+    lib/texture/texture.cpp
 )
 
 # Create a library target
@@ -45,6 +49,9 @@ target_link_libraries(test_intersection PRIVATE easy_tracer_v2_lib)
 
 add_executable(test_rand test/test_rand.cpp)
 target_link_libraries(test_rand PRIVATE easy_tracer_v2_lib)
+
+add_executable(test_sampler test/test_sampler.cpp)
+target_link_libraries(test_sampler PRIVATE easy_tracer_v2_lib)
 
 add_executable(test_vector test/test_vector.cpp)
 target_link_libraries(test_vector PRIVATE easy_tracer_v2_lib)

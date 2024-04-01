@@ -21,4 +21,5 @@ int main() {
         cout << buc[i] << ' ';
     }
     cout << endl;
+    return 0;
 }

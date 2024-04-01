@@ -1,5 +1,8 @@
 #include "sampler.hpp"
 
+Sampler::Sampler() {
+}
+
 void Sampler::sample_out(RNG *rng, const Vec3 &dir_in, const Vec3 &norm, Vec3 &dir_out, float &pdf) {
 }
 
