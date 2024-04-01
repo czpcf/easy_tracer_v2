@@ -114,7 +114,7 @@ float Vec3::angle(const Vec3 &b) {
     return acos(s);
 }
 
-float Vec3::square() {
+float Vec3::square() const {
     return x * x + y * y + z * z;
 }
 

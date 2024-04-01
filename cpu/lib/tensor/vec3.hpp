@@ -50,7 +50,7 @@ public:
     float angle(const Vec3 &b);
 
     /// @brief return the squared length of the vector
-    float square();
+    float square() const;
 
     /// @brief reflection via b
     Vec3 reflect(const Vec3 &b);
