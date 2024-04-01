@@ -9,12 +9,21 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fopenmp -Wall")
 
 set(SOURCE_FILES
     lib/accel/box.cpp
+    lib/bxdf/bxdf.cpp
+    lib/bxdf/bxdf_lambertian.cpp
     lib/geometry/geometry.cpp
+    lib/geometry/sphere.cpp
     lib/geometry/triangle.cpp
     lib/random/random.cpp
     lib/random/random_mt19937.cpp
     lib/ray/ray.cpp
     lib/ray/ray_hit.cpp
+    lib/resource/resource_group.cpp
+    lib/sampler/onb
+    lib/sampler/sampler_lambertian.cpp
+    lib/sampler/sampler_reflection.cpp
+    lib/sampler/sampler_refraction.cpp
+    lib/sampler/sampler.cpp
     lib/tensor/mat3.cpp
     lib/tensor/vec2.cpp
     lib/tensor/vec3.cpp
@@ -28,8 +37,14 @@ add_library(easy_tracer_v2_lib STATIC ${SOURCE_FILES})
 target_compile_options(easy_tracer_v2_lib PRIVATE -O3 -fopenmp)
 
 # Create executable targets and link with the library
-add_executable(test_vector test/test_vector.cpp)
-target_link_libraries(test_vector PRIVATE easy_tracer_v2_lib)
+add_executable(test_box test/test_box.cpp)
+target_link_libraries(test_box PRIVATE easy_tracer_v2_lib)
+
+add_executable(test_intersection test/test_intersection.cpp)
+target_link_libraries(test_intersection PRIVATE easy_tracer_v2_lib)
 
 add_executable(test_rand test/test_rand.cpp)
 target_link_libraries(test_rand PRIVATE easy_tracer_v2_lib)
+
+add_executable(test_vector test/test_vector.cpp)
+target_link_libraries(test_vector PRIVATE easy_tracer_v2_lib)

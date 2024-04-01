@@ -27,7 +27,11 @@ public:
     float get_dis();
 
     /// @brief return hit object uv coordinate
-    const Vec2 &get_uv() const;
+    const Vec2 &get_local() const;
+
+    /// @brief return p + t * d
+    Vec3 get_inter(const Vec3 &p, const Vec3 &d);
+
 private:
     /// @brief ray hit id
     int id;

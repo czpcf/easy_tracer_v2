@@ -2,6 +2,9 @@
 geometry
 its just geometry, do not have normal, bxdf or texture
 */
+#ifndef GEOMETRY_H
+#define GEOMETRY_H
+
 #include <utility>
 #include "../tensor/vec2.hpp"
 #include "../tensor/vec3.hpp"
@@ -11,8 +14,6 @@ its just geometry, do not have normal, bxdf or texture
 #include "../ray/ray_hit.hpp"
 #include "../random/random.hpp"
 
-#ifndef GEOMETRY_H
-#define GEOMETRY_H
 class Geometry {
 public:
     Geometry();
@@ -22,6 +23,11 @@ public:
     /// if intersected, return true and set ray-hit
     /// otherwise return false and do nothing
     virtual bool inter(Ray, RayHit &);
+
+    /// @brief intersection with the line from point p in direction d
+    /// if intersected, return true and UPDATE ray-hit
+    /// otherwise return false and do nothing
+    virtual bool inter_update(Ray, RayHit &);
     
     /// @brief check if the ray hits the shape given the distance,
     /// distance should be squared

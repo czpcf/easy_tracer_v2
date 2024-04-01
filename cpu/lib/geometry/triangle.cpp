@@ -99,6 +99,66 @@ bool Triangle::inter(Ray ray, RayHit &hit) {
     return false;
 }
 
+bool Triangle::inter_update(Ray ray, RayHit &hit) {
+    Vec3 d = ray.get_direction();
+    Vec3 p = ray.get_origin();
+    float t = d.dot(norm);
+    if(std::abs(t) < EPS) {
+        return false;
+    }
+    t = ((p1 - p).dot(norm)) / t;
+    if(std::isnan(t) || t < 0 || t >= hit.get_dis()) {
+        return false;
+    }
+    Vec3 inter = p + d * t;
+    float x = inter.x, y = inter.y, z = inter.z;
+    float s1, s2, s3, t1, t3, sum;
+    switch(type) {
+        case 2:
+            s1 = (p1.y - y) * (p2.z - z) - (p2.y - y) * (p1.z - z);
+            s2 = (p2.y - y) * (p3.z - z) - (p3.y - y) * (p2.z - z);
+            s3 = (p3.y - y) * (p1.z - z) - (p1.y - y) * (p3.z - z);
+            if((s1 < 0 && s2 < 0 && s3 < 0) || (s1 > 0 && s2 > 0 && s3 > 0)) { // don't equal 0, in case very far away
+                sum = s1 + s2 + s3;
+                t1 = s1 / sum;
+                t3 = s3 / sum; // think: why?
+                hit.set(0, t, Vec2(t1, t3));
+                return true;
+            }
+            return false;
+        break;
+        case 1:
+            s1 = (p1.x - x) * (p2.z - z) - (p2.x - x) * (p1.z - z);
+            s2 = (p2.x - x) * (p3.z - z) - (p3.x - x) * (p2.z - z);
+            s3 = (p3.x - x) * (p1.z - z) - (p1.x - x) * (p3.z - z);
+            if((s1 < 0 && s2 < 0 && s3 < 0) || (s1 > 0 && s2 > 0 && s3 > 0)) {
+                sum = s1 + s2 + s3;
+                t1 = s1 / sum;
+                t3 = s3 / sum;
+                hit.set(0, t, Vec2(t1, t3));
+                return true;
+            }
+            return false;
+        break;
+        case 0:
+            s1 = (p1.x - x) * (p2.y - y) - (p2.x - x) * (p1.y - y);
+            s2 = (p2.x - x) * (p3.y - y) - (p3.x - x) * (p2.y - y);
+            s3 = (p3.x - x) * (p1.y - y) - (p1.x - x) * (p3.y - y);
+            if((s1 < 0 && s2 < 0 && s3 < 0) || (s1 > 0 && s2 > 0 && s3 > 0)) {
+                sum = s1 + s2 + s3;
+                t1 = s1 / sum;
+                t3 = s3 / sum;
+                hit.set(0, t, Vec2(t1, t3));
+                return true;
+            }
+            return false;
+        break;
+        default:
+            assert(0);
+    }
+    return false;
+}
+
 bool Triangle::if_inter_dis(Ray ray, float dis) {
     Vec3 d = ray.get_direction();
     Vec3 p = ray.get_origin();

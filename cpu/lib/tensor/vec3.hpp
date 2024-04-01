@@ -35,7 +35,7 @@ public:
     float sum();
 
     /// @brief return the dot product: <a, b>
-    float dot(const Vec3 &b);
+    float dot(const Vec3 &b) const;
 
     /// @brief return the norm of this vector, errors will occur if the vector is 0
     Vec3 norm();

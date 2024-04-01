@@ -12,9 +12,10 @@ public:
     /// @brief initialization with two points
     Box(const Vec3 &, const Vec3 &);
     ~Box() = default;
-    Vec3 get_lower();
-    Vec3 get_upper();
-    Vec3 get_mid();
+
+    const Vec3 &lower() const;
+    const Vec3 &upper() const;
+    const Vec3 &mid() const;
 
     /// @brief add one more point, then change the bound
     void add(const Vec3 &);
@@ -54,10 +55,6 @@ public:
 
     /// @brief return area / 2
     float half_area();
-
-    const Vec3 &lower() const;
-    const Vec3 &upper() const;
-    const Vec3 &mid() const;
 
 private:
     /// point with smaller values

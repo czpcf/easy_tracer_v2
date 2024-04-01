@@ -82,7 +82,7 @@ float Vec3::sum() {
     return x + y + z;
 }
 
-float Vec3::dot(const Vec3 &b) {
+float Vec3::dot(const Vec3 &b) const {
     return x * b.x + y * b.y + z * b.z;
 }
 

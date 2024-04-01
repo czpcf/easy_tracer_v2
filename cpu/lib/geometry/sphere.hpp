@@ -1,19 +1,21 @@
 /*
-triangle
+sphere
 */
-#ifndef TRIANGLE_H
-#define TRIANGLE_H
+#ifndef SPHERE_H
+#define SPHERE_H
 
 #include "geometry.hpp"
 #include "../tensor/vec3.hpp"
 #include "../tensor/mat3.hpp"
 
-class Triangle: public Geometry {
+class Sphere: public Geometry {
 public:
-    Triangle();
-    /// @brief counter-clockwise: p1 -> p2 -> p3
-    Triangle(Vec3, Vec3, Vec3);
-    
+    Sphere();
+    ~Sphere();
+
+    /// @brief z-axis, x-axis, origin and the radius
+    Sphere(Vec3, Vec3, Vec3, float);
+
     /// @brief intersection with the line from point p in direction d
     /// if intersected, return true and set ray-hit
     /// otherwise return false and do nothing
@@ -41,13 +43,17 @@ public:
     float area() override;
 
 private:
-    /// @brief fast pre-calculation
-    unsigned short type;
+    friend class EmittorSphere;
     /// @brief area
     float _area;
-    /// @brief 3 vertices of the triangle
-    Vec3 p1, p2, p3;
-    /// @brief normal of the triangle
-    Vec3 norm;
+    /// @brief radius
+    float r;
+    /// @brief z-axis of the sphere. Use [0, pi]x[0, 2pi] -> S^2 mapping
+    /// (sin\theta cos\phi, sin\theta sin\phi, cos\theta)
+    Vec3 z;
+    /// @brief x-axis of the sphere, and then y-axis is determined by z * x
+    Vec3 x, y;
+    /// @brief origin of the sphere
+    Vec3 ori;
 };
 #endif

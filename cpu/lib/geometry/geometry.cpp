@@ -9,6 +9,10 @@ bool Geometry::inter(Ray ray, RayHit &hit) {
     return false;
 }
 
+bool Geometry::inter_update(Ray ray, RayHit &hit) {
+    return false;
+}
+
 bool Geometry::if_inter_dis(Ray ray, float dis_s) {
     return false;
 }

@@ -27,6 +27,10 @@ float RayHit::get_dis() {
     return dis;
 }
 
-const Vec2 &RayHit::get_uv() const {
+const Vec2 &RayHit::get_local() const {
     return local;
+}
+
+Vec3 RayHit::get_inter(const Vec3 &p, const Vec3 &d) {
+    return p + d * dis;
 }
