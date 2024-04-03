@@ -22,16 +22,16 @@ public:
     /// @brief intersection with the line from point p in direction d
     /// if intersected, return true and set ray-hit
     /// otherwise return false and do nothing
-    virtual bool inter(Ray, RayHit &);
+    virtual bool inter(const Ray &, RayHit &);
 
     /// @brief intersection with the line from point p in direction d
     /// if intersected, return true and UPDATE ray-hit
     /// otherwise return false and do nothing
-    virtual bool inter_update(Ray, RayHit &);
+    virtual bool inter_update(const Ray &, RayHit &);
     
     /// @brief check if the ray hits the shape given the distance,
     /// distance should be squared
-    virtual bool if_inter_dis(Ray, float);
+    virtual bool if_inter_dis(const Ray &, float);
 
     /// @brief apply the transform to the geometry permanently
     virtual void trans(Mat3& T);

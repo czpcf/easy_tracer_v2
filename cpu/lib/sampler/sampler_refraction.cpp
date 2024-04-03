@@ -31,8 +31,8 @@ void SamplerRefraction::sample_in(RNG *rng, const Vec3 &dir_out, const Vec3 &nor
     sample_out(rng, dir_out, norm, dir_in, pdf);
 }
 
-void SamplerRefraction::pdf(RNG *rng, const Vec3 &dir_in, const Vec3 &dir_out, const Vec3 &norm, float &pdf) {
-    pdf = 0.0f;
+float SamplerRefraction::pdf(RNG *rng, const Vec3 &dir_in, const Vec3 &dir_out, const Vec3 &norm) {
+    return 0.0f;
 }
 
 bool SamplerRefraction::is_specular() {

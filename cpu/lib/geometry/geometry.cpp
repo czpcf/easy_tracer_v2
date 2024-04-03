@@ -5,15 +5,15 @@
 Geometry::Geometry() {
 }
 
-bool Geometry::inter(Ray ray, RayHit &hit) {
+bool Geometry::inter(const Ray &ray, RayHit &hit) {
     return false;
 }
 
-bool Geometry::inter_update(Ray ray, RayHit &hit) {
+bool Geometry::inter_update(const Ray &ray, RayHit &hit) {
     return false;
 }
 
-bool Geometry::if_inter_dis(Ray ray, float dis_s) {
+bool Geometry::if_inter_dis(const Ray &ray, float dis_s) {
     return false;
 }
 

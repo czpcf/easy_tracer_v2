@@ -17,8 +17,8 @@ void SamplerLambertian::sample_in(RNG *rng, const Vec3 &dir_out, const Vec3 &nor
     pdf = onb.pdf();
 }
 
-void SamplerLambertian::pdf(RNG *rng, const Vec3 &dir_in, const Vec3 &dir_out, const Vec3 &norm, float &pdf) {
-    pdf = Onb::pdf_cosine_sample_hemisphere(dir_out, norm);
+float SamplerLambertian::pdf(RNG *rng, const Vec3 &dir_in, const Vec3 &dir_out, const Vec3 &norm) {
+    return Onb::pdf_cosine_sample_hemisphere(dir_out, norm);
 }
 
 bool SamplerLambertian::is_specular() {

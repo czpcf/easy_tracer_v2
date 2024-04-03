@@ -6,7 +6,7 @@ texture
 
 #include "texture.hpp"
 
-class TextureSimple: Texture {
+class TextureSimple: public Texture {
 public:
     TextureSimple();
     TextureSimple(const Vec3 &);

@@ -19,16 +19,16 @@ public:
     /// @brief intersection with the line from point p in direction d
     /// if intersected, return true and set ray-hit
     /// otherwise return false and do nothing
-    bool inter(Ray, RayHit &) override;
+    bool inter(const Ray &, RayHit &) override;
 
     /// @brief intersection with the line from point p in direction d
     /// if intersected, return true and set ray-hit
     /// otherwise return false and do nothing
-    bool inter_update(Ray, RayHit &) override;
+    bool inter_update(const Ray &, RayHit &) override;
     
     /// @brief check if the ray hits the shape given the distance,
     /// distance should be squared
-    bool if_inter_dis(Ray, float) override;
+    bool if_inter_dis(const Ray &, float) override;
 
     /// @brief apply the transform to the geometry permanently
     void trans(Mat3& T) override;
@@ -42,8 +42,11 @@ public:
     /// @brief return area
     float area() override;
 
+    const Vec3 &z_axis() const;
+    const Vec3 &y_axis() const;
+    const Vec3 &x_axis() const;
+    
 private:
-    friend class EmittorSphere;
     /// @brief area
     float _area;
     /// @brief radius

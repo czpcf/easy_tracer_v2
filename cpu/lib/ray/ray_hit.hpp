@@ -5,8 +5,10 @@ normal, color, bxdf, texture should be in the object pool
 */
 #ifndef RAY_HIT_H
 #define RAY_HIT_H
+
 #include "../tensor/vec2.hpp"
 #include "../tensor/vec3.hpp"
+#include "../ray/ray.hpp"
 
 class RayHit {
 public:
@@ -21,16 +23,22 @@ public:
     void update(int, float, const Vec2 &);
 
     /// @brief return hit object id
-    int get_id();
+    const int get_id() const;
 
     /// @brief return hit distance
-    float get_dis();
+    const float get_dis() const;
 
     /// @brief return hit object uv coordinate
     const Vec2 &get_local() const;
 
     /// @brief return p + t * d
     Vec3 get_inter(const Vec3 &p, const Vec3 &d);
+
+    /// @brief return p + t * d
+    Vec3 get_inter(const Ray &ray);
+
+    /// @brief set hit id
+    void set_id(int);
 
 private:
     /// @brief ray hit id

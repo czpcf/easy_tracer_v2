@@ -53,8 +53,8 @@ class UV {
 public:
     float x;
     float y;
-    UV();
-    ~UV();
+    UV(){x = y = 0.0f;};
+    ~UV() = default;
     UV(float a, float b): x(a), y(b){}
     UV(const Vec2 &a): x(a.x), y(a.y){}
 };

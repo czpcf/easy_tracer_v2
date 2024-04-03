@@ -6,6 +6,9 @@ resource
 
 #include <vector>
 #include <algorithm>
+#include <cstdio>
+#include <cstring>
+#include <cstdlib>
 #include "../tensor/vec2.hpp"
 #include "../tensor/vec3.hpp"
 #include "../tensor/mat3.hpp"
@@ -34,6 +37,12 @@ public:
 
     /// @brief return sampler of the n-th shape according to local & uv
     virtual Sampler *get_sampler(const Vec2 &, const UV &) = 0;
+
+    /// @brief return the shape
+    virtual Geometry *get_shape() = 0;
+
+    /// @brief get color, normal, bxdf and sampler
+    void get_all(const Vec2 &local, Vec3 &color, Vec3 &normal, Bxdf *&bxdf, Sampler *&sampler);
 };
 
 class ResourceGroup {
@@ -42,15 +51,18 @@ public:
     virtual ~ResourceGroup() = default;
     
     /// @brief number of objects in the group
-    virtual void set_size(int) = 0;
+    virtual void set_size(int n) = 0;
     
     /// @brief return number of objects in this group
-    virtual int n_objects();
-
-    /// @brief return the pointer of the n-th shape
-    virtual Geometry* get_shape(int n) = 0;
+    virtual int n_objects() = 0;
 
     /// @brief return the resource of the n-th shape
-    virtual Resource* get_info(int n) = 0;
+    virtual Resource *get_info(int n) = 0;
+
+    /// @brief return the pointer of the n-th shape
+    Geometry *get_shape(int n);
+
+    /// @brief apply transform
+    virtual void trans(Mat3 &T) = 0;
 };
 #endif

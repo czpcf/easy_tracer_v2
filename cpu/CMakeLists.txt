@@ -8,19 +8,36 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fopenmp -Wall")
 
 set(SOURCE_FILES
+    lib/accel/accel_naive.cpp
     lib/accel/accel.cpp
     lib/accel/box.cpp
     lib/bxdf/bxdf.cpp
     lib/bxdf/bxdf_lambertian.cpp
+    lib/bxdf/bxdf_phong.cpp
+    lib/camera/camera_perspective.cpp
+    lib/camera/camera.cpp
+    lib/geometry/direction.cpp
     lib/geometry/geometry.cpp
+    lib/geometry/plane.cpp
+    lib/geometry/point.cpp
     lib/geometry/sphere.cpp
     lib/geometry/triangle.cpp
-    lib/random/random.cpp
+    lib/image/image.cpp
+    lib/light/light_direction.cpp
+    lib/light/light_point.cpp
+    lib/light/light.cpp
+    lib/parser/parser_scene.cpp
     lib/random/random_mt19937.cpp
-    lib/ray/ray.cpp
+    lib/random/random.cpp
     lib/ray/ray_hit.cpp
-    lib/resource/resource.cpp
+    lib/ray/ray.cpp
+    lib/resource/emittor.cpp
+    lib/resource/resource_light_direction.cpp
+    lib/resource/resource_light_point.cpp
     lib/resource/resource_mesh.cpp
+    lib/resource/resource_plane.cpp
+    lib/resource/resource_sphere.cpp
+    lib/resource/resource.cpp
     lib/sampler/onb
     lib/sampler/sampler_lambertian.cpp
     lib/sampler/sampler_reflection.cpp
@@ -55,3 +72,8 @@ target_link_libraries(test_sampler PRIVATE easy_tracer_v2_lib)
 
 add_executable(test_vector test/test_vector.cpp)
 target_link_libraries(test_vector PRIVATE easy_tracer_v2_lib)
+
+
+# shaders
+add_executable(shader_phong shader/shader_phong.cpp)
+target_link_libraries(shader_phong PRIVATE easy_tracer_v2_lib)

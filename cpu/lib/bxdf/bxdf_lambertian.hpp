@@ -3,7 +3,7 @@
 
 #include "bxdf.hpp"
 
-class BxdfLambertian: Bxdf {
+class BxdfLambertian: public Bxdf {
 public:
     BxdfLambertian();
     BxdfLambertian(const Vec3 &n);

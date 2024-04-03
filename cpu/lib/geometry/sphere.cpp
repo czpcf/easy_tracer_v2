@@ -14,7 +14,7 @@ Sphere::~Sphere() {
 }
 
 Sphere::Sphere(Vec3 z_axis, Vec3 x_axis, Vec3 origin, float radius) {
-    if(std::abs(z_axis.dot(x_axis)) > EPS) {
+    if(std::fabs(z_axis.dot(x_axis)) > EPS) {
         std::cerr << "z_axis is not orthogonal to x_axis: "
                   << "(" << z_axis.x << "," << z_axis.y << "," << z_axis.z << ") and "
                   << "(" << x_axis.x << "," << x_axis.y << "," << x_axis.z << ")." << std::endl;
@@ -28,7 +28,7 @@ Sphere::Sphere(Vec3 z_axis, Vec3 x_axis, Vec3 origin, float radius) {
     _area = 4.0f * PI * r * r;
 }
 
-bool Sphere::inter(Ray ray, RayHit &hit) {
+bool Sphere::inter(const Ray & ray, RayHit &hit) {
     Vec3 d = ray.get_direction();
     Vec3 p = ray.get_origin();
     float a = d.dot(d);
@@ -58,7 +58,7 @@ bool Sphere::inter(Ray ray, RayHit &hit) {
     }
     float theta = std::acos(cos_theta);
     Vec3 proj = p - z * p.dot(z); // be careful
-    if(std::abs(proj.x) + std::abs(proj.y) + std::abs(proj.z) <= EPS) {
+    if(std::fabs(proj.x) + std::fabs(proj.y) + std::fabs(proj.z) <= EPS) {
         hit.set(0, t1, Vec2(theta, 0.0f));
         return true;
     }
@@ -72,7 +72,7 @@ bool Sphere::inter(Ray ray, RayHit &hit) {
     return true;
 }
 
-bool Sphere::inter_update(Ray ray, RayHit &hit) {
+bool Sphere::inter_update(const Ray & ray, RayHit &hit) {
     Vec3 d = ray.get_direction();
     Vec3 p = ray.get_origin();
     float a = d.dot(d);
@@ -102,7 +102,7 @@ bool Sphere::inter_update(Ray ray, RayHit &hit) {
     }
     float theta = std::acos(cos_theta);
     Vec3 proj = p - z * p.dot(z); // be careful
-    if(std::abs(proj.x) + std::abs(proj.y) + std::abs(proj.z) <= EPS) {
+    if(std::fabs(proj.x) + std::fabs(proj.y) + std::fabs(proj.z) <= EPS) {
         hit.set(0, t1, Vec2(theta, 0.0f));
         return true;
     }
@@ -116,7 +116,7 @@ bool Sphere::inter_update(Ray ray, RayHit &hit) {
     return true;
 }
 
-bool Sphere::if_inter_dis(Ray ray, float dis) {
+bool Sphere::if_inter_dis(const Ray & ray, float dis) {
     Vec3 d = ray.get_direction();
     Vec3 p = ray.get_origin();
     float a = d.dot(d);
@@ -134,27 +134,27 @@ bool Sphere::if_inter_dis(Ray ray, float dis) {
     if(t1 < 0) {
         return false;
     }
-    if(t1 * t1 >= dis) {
+    if(t1 >= dis) {
         return false;
     }
     return true;
 }
 
-void Sphere::trans(Mat3& T) {
-    z = T.map_scale(z);
-    x = T.map_scale(x);
-    y = T.map_scale(y);
-    ori = T.map_bias(ori);
+void Sphere::trans(Mat3 &T) {
+    z = T.map_scale(z).norm();
+    x = T.map_scale(x).norm();
+    y = T.map_scale(y).norm();
+    ori = T.map(ori);
     _area = 4.0f * PI * r * r;
 }
 
 void Sphere::debug() {
     std::cerr << "Debug Sphere: ";
     std::cerr << '(' << ori.x << ',' << ori.y << ',' << ori.z << ')' << std::endl;
-    std::cerr << "z-axis: " << '(' << z.x << ',' << z.y << ',' << z.z << ')';
-    std::cerr << "x-axis: " << '(' << x.x << ',' << x.y << ',' << x.z << ')';
-    std::cerr << "y-axis: " << '(' << y.x << ',' << y.y << ',' << y.z << ')';
-    std::cerr << "radius: " << r << std::endl;
+    std::cerr <<  "z-axis: " << '(' << z.x << ',' << z.y << ',' << z.z << ')';
+    std::cerr << " x-axis: " << '(' << x.x << ',' << x.y << ',' << x.z << ')';
+    std::cerr << " y-axis: " << '(' << y.x << ',' << y.y << ',' << y.z << ')';
+    std::cerr << " radius: " << r << std::endl;
 }
 
 Box Sphere::bound() {
@@ -163,4 +163,16 @@ Box Sphere::bound() {
 
 float Sphere::area() {
     return _area;
+}
+
+const Vec3 &Sphere::z_axis() const{
+    return z;
+}
+
+const Vec3 &Sphere::x_axis() const{
+    return x;
+}
+
+const Vec3 &Sphere::y_axis() const{
+    return y;
 }

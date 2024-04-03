@@ -24,28 +24,25 @@ public:
     virtual void set_size(int n) = 0;
 
     /// @brief add single resource
-    virtual void add(const Geometry*, const Resource*) = 0;
+    virtual void add(Geometry *) = 0;
 
     /// @brief add resource group
-    virtual void add(const ResourceGroup &) = 0;
+    virtual void add(ResourceGroup *) = 0;
 
     /// @brief intersection with the line from point p in direction d
     /// if intersected, return true and set ray-hit
     /// otherwise return false and do nothing
-    virtual bool inter(Ray, RayHit &) = 0;
+    virtual bool inter(const Ray&, RayHit &) = 0;
 
-    /// @brief intersection with the line from point p in direction d
-    /// if intersected, return true and UPDATE ray-hit
-    /// otherwise return false and do nothing
-    virtual bool inter_update(Ray, RayHit &) = 0;
-    
     /// @brief check if the ray hits the shape given the distance,
     /// distance should be squared
-    virtual bool if_inter_dis(Ray, float) = 0;
+    virtual bool if_inter_dis(const Ray&, float) = 0;
 
-private:
+    /// @brief build accelerator
+    virtual void build() = 0;
+
+protected:
     std::vector<Box> boxes;
     std::vector<Geometry*> shapes;
-    std::vector<Resource*> infos;
 };
 #endif

@@ -34,7 +34,7 @@ public:
     Mat3 operator*(const Mat3&g);
 
     /// @brief return f(x) = I * x + 0
-    Mat3 id();
+    static Mat3 id();
 
     /// @brief return f(x)=Ax+b
     Vec3 map(const Vec3&x);
@@ -49,16 +49,16 @@ public:
     float det();
     
     /// @brief scaling
-    Mat3 mat_from_scale(Vec3 scale);
+    static Mat3 mat_from_scale(Vec3 scale);
 
     /// @brief transition
-    Mat3 mat_from_trans(Vec3 trans);
+    static Mat3 mat_from_trans(Vec3 trans);
 
     /// @brief ratation
-    Mat3 mat_from_rotate(const Vec3 &b, float theta);
+    static Mat3 mat_from_rotate(const Vec3 &b, float theta);
 
     /// @brief return the look-at matrix
-    Mat3 look_at(const Vec3 &eye, const Vec3 &center, const Vec3 &up);
+    static Mat3 look_at(const Vec3 &eye, const Vec3 &center, const Vec3 &up);
 
 private:
     /// the vector b

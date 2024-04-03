@@ -152,7 +152,7 @@ Mat3 Mat3::mat_from_rotate(const Vec3 &b, float theta) {
 }
 
 Mat3 Mat3::look_at(const Vec3 &eye, const Vec3 &center, const Vec3 &up) {
-    Vec3 z = (eye - center).norm();
+    Vec3 z = (center - eye).norm();
     Vec3 y = up;
     Vec3 x = y.cross(z);
 	// the x, y, and z vectors define the orthonormal coordinate system

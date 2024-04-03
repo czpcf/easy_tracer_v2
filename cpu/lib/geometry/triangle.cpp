@@ -18,13 +18,13 @@ Triangle::Triangle(Vec3 point1, Vec3 point2, Vec3 point3): p1(point1), p2(point2
     float x3 = p3.x, y3 = p3.y;
     float dx12 = x2 - x1, dy12 = y2 - y1;
     float dx13 = x3 - x1, dy13 = y3 - y1;
-    bool small_xy = std::abs(dx12 * dy13 - dx13 * dy12) < EPS;
+    bool small_xy = std::fabs(dx12 * dy13 - dx13 * dy12) < EPS;
     float z1 = p1.z;
     float z2 = p2.z;
     float z3 = p3.z;
     float dz12 = z2 - z1;
     float dz13 = z3 - z1;
-    bool small_xz = std::abs(dx12 * dz13 - dx13 * dz12) < EPS;
+    bool small_xz = std::fabs(dx12 * dz13 - dx13 * dz12) < EPS;
     // if in x-z plane or y-z plane
     if(small_xy) {
         // if in y-z plane
@@ -39,11 +39,11 @@ Triangle::Triangle(Vec3 point1, Vec3 point2, Vec3 point3): p1(point1), p2(point2
     _area = (p2 - p1).cross(p3 - p1).len() / 2.0f;
 }
 
-bool Triangle::inter(Ray ray, RayHit &hit) {
+bool Triangle::inter(const Ray & ray, RayHit &hit) {
     Vec3 d = ray.get_direction();
     Vec3 p = ray.get_origin();
     float t = d.dot(norm);
-    if(std::abs(t) < EPS) {
+    if(std::fabs(t) < EPS) {
         return false;
     }
     t = ((p1 - p).dot(norm)) / t;
@@ -99,11 +99,11 @@ bool Triangle::inter(Ray ray, RayHit &hit) {
     return false;
 }
 
-bool Triangle::inter_update(Ray ray, RayHit &hit) {
+bool Triangle::inter_update(const Ray & ray, RayHit &hit) {
     Vec3 d = ray.get_direction();
     Vec3 p = ray.get_origin();
     float t = d.dot(norm);
-    if(std::abs(t) < EPS) {
+    if(std::fabs(t) < EPS) {
         return false;
     }
     t = ((p1 - p).dot(norm)) / t;
@@ -159,18 +159,18 @@ bool Triangle::inter_update(Ray ray, RayHit &hit) {
     return false;
 }
 
-bool Triangle::if_inter_dis(Ray ray, float dis) {
+bool Triangle::if_inter_dis(const Ray & ray, float dis) {
     Vec3 d = ray.get_direction();
     Vec3 p = ray.get_origin();
     float t = d.dot(norm);
-    if(std::abs(t) < EPS) {
+    if(std::fabs(t) < EPS) {
         return false;
     }
     t = ((p1 - p).dot(norm)) / t;
     if(std::isnan(t) || t < 0) {
         return false;
     }
-    if(t * t >= dis) {
+    if(t >= dis) {
         return false;
     }
     Vec3 inter = p + d * t;
@@ -220,13 +220,13 @@ void Triangle::trans(Mat3&T) {
     float x3 = p3.x, y3 = p3.y;
     float dx12 = x2 - x1, dy12 = y2 - y1;
     float dx13 = x3 - x1, dy13 = y3 - y1;
-    bool small_xy = std::abs(dx12 * dy13 - dx13 * dy12) < EPS;
+    bool small_xy = std::fabs(dx12 * dy13 - dx13 * dy12) < EPS;
     float z1 = p1.z;
     float z2 = p2.z;
     float z3 = p3.z;
     float dz12 = z2 - z1;
     float dz13 = z3 - z1;
-    bool small_xz = std::abs(dx12 * dz13 - dx13 * dz12) < EPS;
+    bool small_xz = std::fabs(dx12 * dz13 - dx13 * dz12) < EPS;
     // if in x-z plane or y-z plane
     if(small_xy) {
         // if in y-z plane
@@ -257,4 +257,8 @@ Box Triangle::bound() {
 
 float Triangle::area() {
     return _area;
+}
+
+const Vec3 Triangle::get_norm() const {
+    return norm;
 }
