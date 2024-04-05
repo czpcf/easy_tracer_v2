@@ -29,6 +29,9 @@ public:
     /// @brief check if the ray hits the shape given the distance,
     /// distance should be squared
     bool if_inter_dis(const Ray &, float) override;
+    
+    /// @brief convert intersecion into local
+    Vec2 inter_to_local(const Vec3 &) override;
 
     /// @brief apply the transform to the geometry permanently
     void trans(Mat3& T) override;

@@ -57,6 +57,7 @@ LightPoint *ResourceLightPoint::get_light() {
 
 
 
+
 Light *ResourceGroupLightPoint::get_light(int n) {
     return infos[n].get_light();
 }

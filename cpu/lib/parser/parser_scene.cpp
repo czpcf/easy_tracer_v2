@@ -4,9 +4,18 @@
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
+#include <vector>
+#include <map>
 #include "parser_scene.hpp"
 
+SceneParser::SceneParser() {
+}
+
 SceneParser::SceneParser(const char *filename) {
+    init(filename);
+}
+
+void SceneParser::init(const char *filename) {
     camera = nullptr;
     background_color = Vec3(0.0f, 0.0f, 0.0f);
 
@@ -77,6 +86,19 @@ int SceneParser::get_token(char token[MAX_PARSER_TOKEN_LENGTH]) {
     return 1;
 }
 
+void SceneParser::get_token_expect(char token[MAX_PARSER_TOKEN_LENGTH], const char *expect) {
+    // for simplicity, tokens must be separated by whitespace
+    assert (file != nullptr);
+    int success = fscanf(file, "%s ", token);
+    if (success == EOF) {
+        token[0] = '\0';
+    }
+    if(strcmp(token, expect) != 0) {
+        fprintf(stderr, "unexpected token found: %s, expect: %s\n", token, expect);
+        assert(0);
+    }
+}
+
 float SceneParser::degrees_to_radians(float x) {
     return x * PI / 180.0f;
 }
@@ -114,37 +136,28 @@ int SceneParser::read_int() {
 void SceneParser::parse_perspective_camera() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     // read in the camera parameters
-    get_token(token);
-    assert (!strcmp(token, "{"));
-    get_token(token);
-    assert (!strcmp(token, "center"));
+    get_token_expect(token, "{");
+    get_token_expect(token, "center");
     Vec3 center = read_vec3();
-    get_token(token);
-    assert (!strcmp(token, "direction"));
+    get_token_expect(token, "direction");
     Vec3 direction = read_vec3();
-    get_token(token);
-    assert (!strcmp(token, "up"));
+    get_token_expect(token, "up");
     Vec3 up = read_vec3();
-    get_token(token);
-    assert (!strcmp(token, "angle"));
+    get_token_expect(token, "angle");
     float angle_degrees = read_float();
     float angle_radians = degrees_to_radians(angle_degrees);
-    get_token(token);
-    assert (!strcmp(token, "width"));
+    get_token_expect(token, "width");
     int width = read_int();
-    get_token(token);
-    assert (!strcmp(token, "height"));
+    get_token_expect(token, "height");
     int height = read_int();
-    get_token(token);
-    assert (!strcmp(token, "}"));
+    get_token_expect(token, "}");
     camera = new CameraPerspective(center, direction, up, width, height, angle_radians);
 }
 
 void SceneParser::parse_background() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     // read in the background color
-    get_token(token);
-    assert (!strcmp(token, "{"));
+    get_token_expect(token, "{");
     while (true) {
         get_token(token);
         if (!strcmp(token, "}")) {
@@ -160,11 +173,9 @@ void SceneParser::parse_background() {
 
 void SceneParser::parse_materials() {
     char token[MAX_PARSER_TOKEN_LENGTH];
-    get_token(token);
-    assert (!strcmp(token, "{"));
+    get_token_expect(token, "{");
     // read in the number of objects
-    get_token(token);
-    assert (!strcmp(token, "numMaterials"));
+    get_token_expect(token, "numMaterials");
     int n_materials = read_int();
     
     bxdfs.reserve(n_materials);
@@ -177,25 +188,25 @@ void SceneParser::parse_materials() {
         get_token(token);
         if (strcmp(token, "Material") == 0 ||
             strcmp(token, "PhongMaterial") == 0) {
-            parse_material_lambertian();
+            parse_material_phong();
+        } else if (strcmp(token, "bxdfLambertian") == 0) {
+            parse_bxdf_lambertian();
         } else {
             printf("Unknown token in parseMaterial: '%s'\n", token);
             exit(0);
         }
         count++;
     }
-    get_token(token);
-    assert (!strcmp(token, "}"));
+    get_token_expect(token, "}");
 }
 
-void SceneParser::parse_material_lambertian() {
+void SceneParser::parse_material_phong() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     char filename[MAX_PARSER_TOKEN_LENGTH];
     filename[0] = 0;
     Vec3 diffuseColor(1, 1, 1), specularColor(0, 0, 0);
     float shininess = 0;
-    get_token(token);
-    assert (!strcmp(token, "{"));
+    get_token_expect(token, "{");
     while (true) {
         get_token(token);
         if (strcmp(token, "diffuseColor") == 0) {
@@ -220,17 +231,31 @@ void SceneParser::parse_material_lambertian() {
     textures.push_back(texture);
 }
 
+void SceneParser::parse_bxdf_lambertian() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    char filename[MAX_PARSER_TOKEN_LENGTH];
+    filename[0] = 0;
+    get_token_expect(token, "{");
+    Vec3 color = read_vec3();
+    get_token_expect(token, "}");
+
+    auto *bxdf = new BxdfLambertian(color);
+    auto *sampler = new SamplerLambertian();
+    auto *texture = new TextureSimple(Vec3(1.0f, 1.0f, 1.0f));
+    bxdfs.push_back(bxdf);
+    samplers.push_back(sampler);
+    textures.push_back(texture);
+}
+
 int SceneParser::get_num_materials() {
     return bxdfs.size();
 }
 
 void SceneParser::parse_lights() {
     char token[MAX_PARSER_TOKEN_LENGTH];
-    get_token(token);
-    assert (!strcmp(token, "{"));
+    get_token_expect(token, "{");
     // read in the number of objects
-    get_token(token);
-    assert (!strcmp(token, "numLights"));
+    get_token_expect(token, "numLights");
     int num_lights = read_int();
     // read in the objects
     int count = 0;
@@ -240,28 +265,25 @@ void SceneParser::parse_lights() {
             parse_directional_light();
         } else if (strcmp(token, "PointLight") == 0) {
             parse_point_light();
+        } else if (strcmp(token, "TriangularLight") == 0) {
+            parse_triangle_light();
         } else {
             printf("Unknown token in parseLight: '%s'\n", token);
             exit(0);
         }
         count++;
     }
-    get_token(token);
-    assert (!strcmp(token, "}"));
+    get_token_expect(token, "}");
 }
 
 void SceneParser::parse_point_light() {
     char token[MAX_PARSER_TOKEN_LENGTH];
-    get_token(token);
-    assert (!strcmp(token, "{"));
-    get_token(token);
-    assert (!strcmp(token, "position"));
+    get_token_expect(token, "{");
+    get_token_expect(token, "position");
     Vec3 position = read_vec3();
-    get_token(token);
-    assert (!strcmp(token, "color"));
+    get_token_expect(token, "color");
     Vec3 color = read_vec3();
-    get_token(token);
-    assert (!strcmp(token, "}"));
+    get_token_expect(token, "}");
 
     LightPoint *light_point = new LightPoint(Point(position));
     ResourceGroupLightPoint *group = new ResourceGroupLightPoint;
@@ -272,22 +294,46 @@ void SceneParser::parse_point_light() {
 
 void SceneParser::parse_directional_light() {
     char token[MAX_PARSER_TOKEN_LENGTH];
-    get_token(token);
-    assert (!strcmp(token, "{"));
-    get_token(token);
-    assert (!strcmp(token, "direction"));
+    get_token_expect(token, "{");
+    get_token_expect(token, "direction");
     Vec3 direction = read_vec3();
-    get_token(token);
-    assert (!strcmp(token, "color"));
+    get_token_expect(token, "color");
     Vec3 color = read_vec3();
-    get_token(token);
-    assert (!strcmp(token, "}"));
+    get_token_expect(token, "}");
 
     LightDirection *light_direction = new LightDirection(Direction(direction));
     ResourceGroupLightDirection *group = new ResourceGroupLightDirection;
     ResourceLightDirection info(light_direction, nullptr, nullptr, nullptr, color);
     group->add(info);
     group_light_direction.push_back(group);
+}
+
+void SceneParser::parse_triangle_light() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    get_token_expect(token, "{");
+    get_token_expect(token, "MaterialIndex");
+    int index = read_int();
+    get_token_expect(token, "emittor");
+    Vec3 emittor = read_vec3();
+    get_token_expect(token, "p0");
+    Vec3 p0 = read_vec3();
+    get_token_expect(token, "p1");
+    Vec3 p1 = read_vec3();
+    get_token_expect(token, "p2");
+    Vec3 p2 = read_vec3();
+    get_token_expect(token, "}");
+
+    LightTriangle *light_triangle = new LightTriangle(Triangle(p0, p1, p2));
+    ResourceGroupLightTriangle *group = new ResourceGroupLightTriangle;
+    ResourceLightTriangle info(
+        light_triangle,
+        samplers[index],
+        bxdfs[index],
+        textures[index],
+        emittor
+    );
+    group->add(info);
+    group_light_triangle.push_back(group);
 }
 
 void SceneParser::parse_group(int current_index, Mat3 T) {
@@ -300,12 +346,10 @@ void SceneParser::parse_group(int current_index, Mat3 T) {
     // simple, and essentially ignores any tree hierarchy)
     //
     char token[MAX_PARSER_TOKEN_LENGTH];
-    get_token(token);
-    assert (!strcmp(token, "{"));
+    get_token_expect(token, "{");
 
     // read in the number of objects
-    get_token(token);
-    assert (!strcmp(token, "numObjects"));
+    get_token_expect(token, "numObjects");
     int num_objects = read_int();
 
     // read in the objects
@@ -322,8 +366,7 @@ void SceneParser::parse_group(int current_index, Mat3 T) {
             count++;
         }
     }
-    get_token(token);
-    assert (!strcmp(token, "}"));
+    get_token_expect(token, "}");
 }
 
 void SceneParser::parse_object(int current_index, Mat3 T, char token[MAX_PARSER_TOKEN_LENGTH]) {
@@ -347,16 +390,12 @@ void SceneParser::parse_object(int current_index, Mat3 T, char token[MAX_PARSER_
 
 void SceneParser::parse_sphere(int current_index, Mat3 T) {
     char token[MAX_PARSER_TOKEN_LENGTH];
-    get_token(token);
-    assert (!strcmp(token, "{"));
-    get_token(token);
-    assert (!strcmp(token, "center"));
+    get_token_expect(token, "{");
+    get_token_expect(token, "center");
     Vec3 center = read_vec3();
-    get_token(token);
-    assert (!strcmp(token, "radius"));
+    get_token_expect(token, "radius");
     float radius = read_float();
-    get_token(token);
-    assert (!strcmp(token, "}"));
+    get_token_expect(token, "}");
 
     ResourceGroupSphere *group = new ResourceGroupSphere;
     group->set_size(1);
@@ -370,7 +409,7 @@ void SceneParser::parse_sphere(int current_index, Mat3 T) {
         radius);
     if(current_index == -1) {
         fprintf(stderr, "no material found!\n");
-        exit(0);
+        assert(0);
     }
     ResourceSphere info(
         sphere,
@@ -385,16 +424,12 @@ void SceneParser::parse_sphere(int current_index, Mat3 T) {
 
 void SceneParser::parse_plane(int current_index, Mat3 T) {
     char token[MAX_PARSER_TOKEN_LENGTH];
-    get_token(token);
-    assert (!strcmp(token, "{"));
-    get_token(token);
-    assert (!strcmp(token, "normal"));
+    get_token_expect(token, "{");
+    get_token_expect(token, "normal");
     Vec3 normal = read_vec3();
-    get_token(token);
-    assert (!strcmp(token, "offset"));
+    get_token_expect(token, "offset");
     float offset = read_float();
-    get_token(token);
-    assert (!strcmp(token, "}"));   
+    get_token_expect(token, "}");
     ResourceGroupPlane *group = new ResourceGroupPlane;
     group->set_size(1);
     Vec3 origin = normal * offset;
@@ -406,7 +441,7 @@ void SceneParser::parse_plane(int current_index, Mat3 T) {
     );
     if(current_index == -1) {
         fprintf(stderr, "no material found!\n");
-        exit(0);
+        assert(0);
     }
     ResourcePlane info(
         plane,
@@ -421,26 +456,21 @@ void SceneParser::parse_plane(int current_index, Mat3 T) {
 
 void SceneParser::parse_triangle(int current_index, Mat3 T) {
     char token[MAX_PARSER_TOKEN_LENGTH];
-    get_token(token);
-    assert (!strcmp(token, "{"));
-    get_token(token);
-    assert (!strcmp(token, "vertex0"));
+    get_token_expect(token, "{");
+    get_token_expect(token, "vertex0");
     Vec3 v0 = read_vec3();
-    get_token(token);
-    assert (!strcmp(token, "vertex1"));
+    get_token_expect(token, "vertex1");
     Vec3 v1 = read_vec3();
-    get_token(token);
-    assert (!strcmp(token, "vertex2"));
+    get_token_expect(token, "vertex2");
     Vec3 v2 = read_vec3();
-    get_token(token);
-    assert (!strcmp(token, "}"));
+    get_token_expect(token, "}");
     ResourceGroupMesh *group = new ResourceGroupMesh;
     group->set_size(1);
     Triangle *triangle = new Triangle(v0, v1, v2);
     Vec3 norm = triangle->get_norm();
     if(current_index == -1) {
         fprintf(stderr, "no material found!\n");
-        exit(0);
+        assert(0);
     }
     ResourceTriangle info(
         triangle,
@@ -459,24 +489,55 @@ void SceneParser::parse_triangle_mesh(int current_index, Mat3 T) {
     char token[MAX_PARSER_TOKEN_LENGTH];
     char filename[MAX_PARSER_TOKEN_LENGTH];
     // get the filename
-    get_token(token);
-    assert (!strcmp(token, "{"));
-    get_token(token);
+    get_token_expect(token, "{");
+
+    int index_defualt = current_index;
+    std::map<int, bool> have;
+    std::map<int, int> index_map;
+    std::map<int, Bxdf*> bxdf_map;
+    std::map<int, Sampler*> sampler_map;
+    std::map<int, Texture*> texture_map;
+    bxdf_map[-1] = bxdfs[index_defualt];
+    sampler_map[-1] = samplers[index_defualt];
+    texture_map[-1] = textures[index_defualt];
+    while(true) {
+        get_token(token);
+        if(!strcmp(token, "faceMaterial")) {
+            get_token(token);
+            if(!strcmp(token, "default")) {
+                index_defualt = read_int();
+                bxdf_map[-1] = bxdfs[index_defualt];
+                sampler_map[-1] = samplers[index_defualt];
+                texture_map[-1] = textures[index_defualt];
+            } else if(!strcmp(token, "f")) {
+                int what = read_int();
+                int index = read_int();
+                have[what] = true;
+                index_map[what] = index;
+                bxdf_map[index] = bxdfs[index];
+                sampler_map[index] = samplers[index];
+                texture_map[index] = textures[index];
+            } else {
+                fprintf(stderr, "bad token found in parse_triangle_mesh !\n");
+                assert(0);
+            }
+        } else {
+            break;
+        }
+    }
+
     assert (!strcmp(token, "obj_file"));
     get_token(filename);
-    get_token(token);
-    assert (!strcmp(token, "}"));
+    get_token_expect(token, "}");
     const char *ext = &filename[strlen(filename) - 4];
     assert(!strcmp(ext, ".obj"));
-    if(current_index == -1) {
-        fprintf(stderr, "no material found!\n");
-        exit(0);
-    }
     ResourceGroupMesh *group = new ResourceGroupMesh(
         filename,
-        samplers[current_index],
-        bxdfs[current_index],
-        textures[current_index]
+        have,
+        index_map,
+        sampler_map,
+        bxdf_map,
+        texture_map
     );
     group->trans(T);
     group_mesh.push_back(group);
@@ -485,8 +546,7 @@ void SceneParser::parse_triangle_mesh(int current_index, Mat3 T) {
 void SceneParser::parse_transform(int current_index, Mat3 T) {
     char token[MAX_PARSER_TOKEN_LENGTH];
     Mat3 matrix = Mat3::id();
-    get_token(token);
-    assert (!strcmp(token, "{"));
+    get_token_expect(token, "{");
     // read in transformations: 
     // apply to the LEFT side of the current matrix (so the first
     // transform in the list is the last applied to the object)
@@ -528,8 +588,7 @@ void SceneParser::parse_transform(int current_index, Mat3 T) {
         get_token(token);
     }
 
-    get_token(token);
-    assert (!strcmp(token, "}"));
+    get_token_expect(token, "}");
 }
 
 
@@ -621,6 +680,23 @@ ResourceGroupLightDirection *SceneParser::get_group_light_direction(int n) {
     return group_light_direction[n];
 }
 
+
+int SceneParser::n_group_light_triangle() {
+    return group_light_triangle.size();
+}
+
+int SceneParser::tot_in_group_light_triangle() {
+    int n = 0;
+    for(int i = 0; i < group_light_triangle.size(); ++i) {
+        n += group_light_triangle[i]->n_objects();
+    }
+    return n;
+}
+
+ResourceGroupLightTriangle *SceneParser::get_group_light_triangle(int n) {
+    return group_light_triangle[n];
+}
+
 // accel //////////////////////////////////////////////////////////////////////
 
 template<typename T>
@@ -672,6 +748,7 @@ Accel *SceneParser::build_accel() {
 
     get_n_light(accel, group_light_point);
     get_n_light(accel, group_light_direction);
+    get_n_light(accel, group_light_triangle);
     get_n(accel, group_mesh);
     get_n(accel, group_sphere);
     get_n(accel, group_plane);
@@ -681,6 +758,7 @@ Accel *SceneParser::build_accel() {
     // add lights first
     add_resource_light(accel, group_light_point);
     add_resource_light(accel, group_light_direction);
+    add_resource_light(accel, group_light_triangle);
     add_resource(accel, group_mesh);
     add_resource(accel, group_sphere);
     add_resource(accel, group_plane);
@@ -705,4 +783,15 @@ ResourceLight *SceneParser::get_light_info(const RayHit &hit) {
 Resource *SceneParser::get_info(const RayHit &hit) {
     assert(n_lights <= hit.get_id() && hit.get_id() < n_tot);
     return accel_resource[hit.get_id() - n_lights];
+}
+
+void SceneParser::get_random_light(RNG *rng, ResourceLight *&light, float &pdf) {
+    int x = rng->rand_uint() % n_lights;
+    light = accel_resource_light[x];
+    pdf = 1.0f / n_lights;
+}
+
+float SceneParser::get_pdf_random_light(const RayHit &hit) {
+    assert(0 <= hit.get_id() && hit.get_id() < n_lights);
+    return 1.0f / n_lights;
 }

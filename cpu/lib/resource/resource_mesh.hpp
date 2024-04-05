@@ -4,6 +4,7 @@
 #include "resource.hpp"
 #include "../geometry/triangle.hpp"
 #include "../texture/texture.hpp"
+#include <map>
 
 class ResourceTriangle: public Resource {
 public:
@@ -48,6 +49,14 @@ public:
     ResourceGroupMesh();
     /// @brief mesh from obj
     ResourceGroupMesh(const char *filename, Sampler *sampler, Bxdf *bxdf, Texture *texture);
+    ResourceGroupMesh(
+        const char *filename,
+        std::map<int, bool> have,
+        std::map<int, int> index_map,
+        std::map<int, Sampler *>sampler_map,
+        std::map<int, Bxdf *>bxdf_map,
+        std::map<int, Texture *>texture_map
+    );
     ~ResourceGroupMesh() override = default;
     
     /// @brief number of objects in the group

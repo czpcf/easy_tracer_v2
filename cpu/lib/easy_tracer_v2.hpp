@@ -23,7 +23,9 @@
 
 #include "image/image.hpp"
 
+#include "light/light_direction.hpp"
 #include "light/light_point.hpp"
+#include "light/light_triangle.hpp"
 #include "light/light.hpp"
 
 #include "parser/parser_scene.hpp"
@@ -37,6 +39,7 @@
 #include "resource/emittor.hpp"
 #include "resource/resource_light_direction.hpp"
 #include "resource/resource_light_point.hpp"
+#include "resource/resource_light_triangle.hpp"
 #include "resource/resource_mesh.hpp"
 #include "resource/resource_plane.hpp"
 #include "resource/resource_sphere.hpp"

@@ -29,6 +29,10 @@ public:
     /// @brief check if the ray hits the shape given the distance,
     /// distance should be squared
     bool if_inter_dis(const Ray&, float) override;
+
+    /// @brief check if the ray hits the shape given the id,
+    /// distance should be squared
+    bool if_inter_id(const Ray&, int) override;
     
     /// @brief build accelerator
     void build() override;

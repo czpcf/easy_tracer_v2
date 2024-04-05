@@ -140,6 +140,27 @@ bool Sphere::if_inter_dis(const Ray & ray, float dis) {
     return true;
 }
 
+Vec2 Sphere::inter_to_local(const Vec3 &inter) {
+    Vec3 p = inter - ori;
+    float cos_theta = p.dot(z) / r; // remember to divide by r because r may not be 1
+    if(cos_theta <= -1.0 + EPS) {
+        return Vec2(PI, 0.0f);
+    } else if(cos_theta >= 1.0 - EPS) {
+        return Vec2(0.0f, 0.0f);
+    }
+    float theta = std::acos(cos_theta);
+    Vec3 proj = p - z * p.dot(z); // be careful
+    if(std::fabs(proj.x) + std::fabs(proj.y) + std::fabs(proj.z) <= EPS) {
+        return Vec2(theta, 0.0f);
+    }
+    float ax = x.angle(proj);
+    float ay = y.angle(proj);
+    if(ay <= PI / 2.0f) {
+        return Vec2(theta, ax);
+    }
+    return Vec2(theta, PI * 2.0f - ax);
+}
+
 void Sphere::trans(Mat3 &T) {
     z = T.map_scale(z).norm();
     x = T.map_scale(x).norm();

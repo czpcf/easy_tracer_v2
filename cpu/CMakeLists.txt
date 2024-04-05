@@ -25,6 +25,7 @@ set(SOURCE_FILES
     lib/image/image.cpp
     lib/light/light_direction.cpp
     lib/light/light_point.cpp
+    lib/light/light_triangle.cpp
     lib/light/light.cpp
     lib/parser/parser_scene.cpp
     lib/random/random_mt19937.cpp
@@ -34,6 +35,7 @@ set(SOURCE_FILES
     lib/resource/emittor.cpp
     lib/resource/resource_light_direction.cpp
     lib/resource/resource_light_point.cpp
+    lib/resource/resource_light_triangle.cpp
     lib/resource/resource_mesh.cpp
     lib/resource/resource_plane.cpp
     lib/resource/resource_sphere.cpp
@@ -77,3 +79,9 @@ target_link_libraries(test_vector PRIVATE easy_tracer_v2_lib)
 # shaders
 add_executable(shader_phong shader/shader_phong.cpp)
 target_link_libraries(shader_phong PRIVATE easy_tracer_v2_lib)
+
+add_executable(shader_naive shader/shader_naive.cpp)
+target_link_libraries(shader_naive PRIVATE easy_tracer_v2_lib)
+
+add_executable(shader_forward_mis shader/shader_forward_mis.cpp)
+target_link_libraries(shader_forward_mis PRIVATE easy_tracer_v2_lib)

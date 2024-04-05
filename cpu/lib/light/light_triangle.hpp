@@ -1,18 +1,18 @@
 /*
-directional light
+triangular light
 */
 
-#ifndef LIGHT_DIRECTION_H
-#define LIGHT_DIRECTION_H
+#ifndef LIGHT_TRIANGLE_H
+#define LIGHT_TRIANGLE_H
 
 #include "light.hpp"
-#include "../geometry/direction.hpp"
+#include "../geometry/triangle.hpp"
 
-class LightDirection: public Light {
+class LightTriangle: public Light {
 public:
-    LightDirection();
-    LightDirection(const Direction &p);
-    ~LightDirection() override = default;
+    LightTriangle();
+    LightTriangle(const Triangle &t);
+    ~LightTriangle() override = default;
 
     /// @brief sample point on the light given the point on the surface, and set pdf
     /// if pdf < 0, its delta distribution
@@ -35,7 +35,7 @@ public:
     /// @brief set pdf according to the point on the light
     /// ALWAYS assuming the ray is ON the light
     /// if pdf < 0, its delta distribution
-    float pdf_point(const Vec3 &) override;
+    float pdf_point(const Vec3 &p_on_light) override;
 
     /// @brief set pdf according to the ray from light -> surface
     /// ALWAYS assuming the ray is ON the light
@@ -50,8 +50,10 @@ public:
     /// @brief decaying of light
     float decaying(const Vec3 &p_on_suf, const Vec3 &p_on_light) override;
 
-private:
-    Direction d;
+    const Vec3 get_norm() const;
+
+protected:
+    Triangle triangle;
 };
 
 #endif

@@ -35,7 +35,7 @@ void Onb::cosine_sample_hemisphere(Vec2 uv) {
 }
 
 float Onb::pdf_cosine_sample_hemisphere(const Vec3 &dir_out, const Vec3 &norm) {
-    return std::abs(norm.dot(dir_out));
+    return std::abs(norm.dot(dir_out)) / PI;
 }
 
 float Onb::pdf() {

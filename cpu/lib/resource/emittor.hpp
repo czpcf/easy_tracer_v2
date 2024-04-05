@@ -21,6 +21,7 @@ public:
 
     /// @brief return the light
     virtual Light *get_light() = 0;
+
 };
 
 class ResourceGroupLight: public ResourceGroup {

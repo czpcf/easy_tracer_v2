@@ -33,6 +33,9 @@ public:
     /// distance should be squared
     virtual bool if_inter_dis(const Ray &, float);
 
+    /// @brief convert intersecion into local
+    virtual Vec2 inter_to_local(const Vec3 &);
+
     /// @brief apply the transform to the geometry permanently
     virtual void trans(Mat3& T);
 

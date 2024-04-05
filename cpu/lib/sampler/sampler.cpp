@@ -9,7 +9,7 @@ void Sampler::sample_out(RNG *rng, const Vec3 &dir_in, const Vec3 &norm, Vec3 &d
 void Sampler::sample_in(RNG *rng, const Vec3 &dir_out, const Vec3 &norm, Vec3 &dir_in, float &pdf) {
 }
 
-float Sampler::pdf(RNG *rng, const Vec3 &dir_in, const Vec3 &dir_out, const Vec3 &norm) {
+float Sampler::pdf(const Vec3 &dir_in, const Vec3 &dir_out, const Vec3 &norm) {
     return 0.0f;
 }
 

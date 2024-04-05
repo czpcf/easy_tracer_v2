@@ -14,12 +14,9 @@ public:
     LightPoint(const Point &p);
     ~LightPoint() override = default;
 
-    /// @brief can sample point on the light?
-    bool can_sample_point() override;
-
     /// @brief sample point on the light given the point on the surface, and set pdf
     /// if pdf < 0, its delta distribution
-    void sample_point(RNG *rng, const Vec3 &p_on_suf, Vec3 &p_on_light, float &pdf) override;
+    void sample_point(RNG *rng, const Vec3 &p_on_suf, Vec3 &p_on_light, float &pdf, Vec2 &local) override;
 
     /// @brief sample direction and set pdf
     /// if pdf < 0, its delta distribution
@@ -27,12 +24,13 @@ public:
 
     /// @brief sample ray on the light and set pdf
     /// if pdf < 0, its delta distribution
-    void sample_ray(RNG *rng, Ray &ray, float &pdf) override;
+    void sample_ray(RNG *rng, Ray &ray, float &pdf, Vec2 &local) override;
 
     /// @brief sample ray on the light and set pdf according to the point on the surface
-    /// the ray should point at the point on the surface
+    /// the ray should point at the point on the surface,
+    /// if return false, cannont sample,
     /// if pdf < 0, its delta distribution
-    void sample_in_ray(RNG *rng, const Vec3 &p_on_suf, Ray &ray, float &pdf) override;
+    bool sample_in_ray(RNG *rng, const Vec3 &p_on_suf, Ray &ray, float &pdf, Vec2 &local) override;
 
     /// @brief set pdf according to the point on the light
     /// ALWAYS assuming the ray is ON the light
@@ -45,6 +43,12 @@ public:
 
     /// @brief return shape
     Geometry *get_shape() override;
+
+    /// @brief is this light specular(cannot sample on its manifold) ?
+    bool is_specular() override;
+
+    /// @brief decaying of light
+    float decaying(const Vec3 &p_on_suf, const Vec3 &p_on_light) override;
 
 private:
     Point o;

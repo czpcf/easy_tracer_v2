@@ -19,6 +19,10 @@ bool Point::if_inter_dis(const Ray &, float) {
     return false;
 }
 
+Vec2 Point::inter_to_local(const Vec3 &) {
+    return Vec2(0.0f, 0.0f);
+}
+
 void Point::trans(Mat3 &T) {
     o = T.map(o);
 }

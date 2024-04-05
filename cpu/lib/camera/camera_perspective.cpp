@@ -14,7 +14,7 @@ CameraPerspective::CameraPerspective(const Vec3 &eye, const Vec3 &direction, con
 
 Ray CameraPerspective::generate_ray(const Vec2 &uv) {
     Vec3 p(0.0f, 0.0f, 0.0f);
-    Vec3 d((uv.x - cx) * fx, (cy - uv.y) * fy, 1);
+    Vec3 d((cx - uv.x) * fx, (uv.y - cy) * fy, 1);
     d.normalize();
     Mat3 T = Mat3::look_at(eye, eye + direction, up);
     Vec3 np = T.map(p);

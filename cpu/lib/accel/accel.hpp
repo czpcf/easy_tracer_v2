@@ -38,6 +38,10 @@ public:
     /// distance should be squared
     virtual bool if_inter_dis(const Ray&, float) = 0;
 
+    /// @brief check if the ray hits the shape given the id,
+    /// distance should be squared
+    virtual bool if_inter_id(const Ray&, int) = 0;
+
     /// @brief build accelerator
     virtual void build() = 0;
 

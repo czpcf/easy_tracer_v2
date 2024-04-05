@@ -57,6 +57,7 @@ LightDirection *ResourceLightDirection::get_light() {
 
 
 
+
 Light *ResourceGroupLightDirection::get_light(int n) {
     return infos[n].get_light();
 }

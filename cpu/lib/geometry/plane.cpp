@@ -64,6 +64,10 @@ bool Plane::if_inter_dis(const Ray &ray, float dis) {
     return tdis < dis;
 }
 
+Vec2 Plane::inter_to_local(const Vec3 &inter) {
+    return Vec2((inter - origin).dot(x), (inter - origin).dot(y));
+}
+
 void Plane::trans(Mat3 &T) {
     origin = T.map(origin);
     z = T.map_scale(z).norm();

@@ -32,7 +32,9 @@ int main(int argc, char *argv[]) {
             RayHit hit;
             if(accel->inter(camRay, hit)) {
                 // only support point light and directional light
-                assert(parser.is_light(hit) == false);
+                if(parser.is_light(hit)) {
+                    continue;
+                }
                 auto info = parser.get_info(hit);
 
                 Vec3 inter, norm, color;
@@ -81,13 +83,14 @@ int main(int argc, char *argv[]) {
                         // sample ray from light to intersection
                         float pdf;
                         Ray ray_in;
-                        light->sample_in_ray(&rng, inter, ray_in, pdf);
+                        Vec2 local; // local is useless here
+                        light->sample_in_ray(&rng, inter, ray_in, pdf, local);
                         Vec3 p_light = ray_in.get_origin();
 
                         // direction from intersection to light
                         Vec3 suf_to_light = (p_light - inter).norm();
 
-                        // direction from intersection on eye
+                        // direction from intersection to eye
                         Vec3 suf_to_eye = -camRay.get_direction();
                         
                         // get emittor
@@ -106,7 +109,8 @@ int main(int argc, char *argv[]) {
                         auto info_light = group_light_direction->get_info(j);
                         float pdf;
                         Ray ray_in;
-                        light->sample_in_ray(&rng, inter, ray_in, pdf);
+                        Vec2 local;
+                        light->sample_in_ray(&rng, inter, ray_in, pdf, local);
                         Vec3 p_light = ray_in.get_origin();
                         Vec3 suf_to_light = (p_light - inter).norm();
                         Vec3 suf_to_eye = -camRay.get_direction();
@@ -114,14 +118,15 @@ int main(int argc, char *argv[]) {
                         radiance += emittor * bxdf->phase(suf_to_light, suf_to_eye, norm);
                     }
                 }
+
                 Vec3 g = radiance * color;
                 // convert radiance to final color
-                image.SetPixel(width - x - 1, height - y - 1, radiance * color);
+                image.set_pixel(x, y, radiance * color);
             } else {
-                image.SetPixel(width - x - 1, height - y - 1, parser.get_background_color());
+                image.set_pixel(x, y, parser.get_background_color());
             }
         }
     }
-    image.SaveBMP(outputFile.c_str());
+    image.save_bmp(outputFile.c_str());
     return 0;
 }

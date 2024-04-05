@@ -17,6 +17,10 @@ bool Geometry::if_inter_dis(const Ray &ray, float dis_s) {
     return false;
 }
 
+Vec2 Geometry::inter_to_local(const Vec3 &) {
+    return Vec2(0.0f, 0.0f);
+}
+
 void Geometry::trans(Mat3 &T) {
 }
 

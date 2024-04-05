@@ -40,7 +40,7 @@ unsigned char ClampColorComponent( float c )
 // Save and Load data type 2 Targa (.tga) files
 // (uncompressed, unmapped RGB images)
 
-void Image::SaveTGA( const char* filename) const
+void Image::save_tga( const char* filename) const
 {
     assert( filename != NULL );
     // must end in .tga
@@ -51,21 +51,21 @@ void Image::SaveTGA( const char* filename) const
     for( int i = 0; i < 18; i++)
     {
         if (i == 2) WriteByte(file,2);
-        else if (i == 12) WriteByte(file,width%256);
-        else if (i == 13) WriteByte(file,width/256);
-        else if (i == 14) WriteByte(file,height%256);
-        else if (i == 15) WriteByte(file,height/256);
+        else if (i == 12) WriteByte(file,_width%256);
+        else if (i == 13) WriteByte(file,_width/256);
+        else if (i == 14) WriteByte(file,_height%256);
+        else if (i == 15) WriteByte(file,_height/256);
         else if (i == 16) WriteByte(file,24);
         else if (i == 17) WriteByte(file,32);
         else WriteByte(file,0);
     }
     // the data
     // flip y so that (0,0) is bottom left corner
-    for (int y = height-1; y >= 0; y--)
+    for (int y = _height-1; y >= 0; y--)
     {
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < _width; x++)
         {
-            Vec3 v = GetPixel(x,y);
+            Vec3 v = get_pixel(x,y);
             // note reversed order: b, g, r
             WriteByte(file,ClampColorComponent(v.z));
             WriteByte(file,ClampColorComponent(v.y));
@@ -75,7 +75,7 @@ void Image::SaveTGA( const char* filename) const
     fclose(file);
 }
 
-Image* Image::LoadTGA(const char *filename) {
+Image* Image::load_tga(const char *filename) {
     assert(filename != NULL);
     // must end in .tga
     const char *ext = &filename[strlen(filename)-4];
@@ -107,7 +107,7 @@ Image* Image::LoadTGA(const char *filename) {
             g = ReadByte(file);
             r = ReadByte(file);
             Vec3 color(r/255.0,g/255.0,b/255.0);
-            answer->SetPixel(x,y,color);
+            answer->set_pixel(x,y,color);
         }
     }
     fclose(file);
@@ -117,7 +117,7 @@ Image* Image::LoadTGA(const char *filename) {
 // Save and Load PPM image files using magic number 'P6' 
 // and having one comment line
 
-void Image::SavePPM(const char *filename) const {
+void Image::save_ppm(const char *filename) const {
     assert(filename != NULL);
     // must end in .ppm
     const char *ext = &filename[strlen(filename)-4];
@@ -127,13 +127,13 @@ void Image::SavePPM(const char *filename) const {
     assert(file != NULL);
     fprintf (file, "P6\n");
     fprintf (file, "# Creator: Image::SavePPM()\n");
-    fprintf (file, "%d %d\n", width,height);
+    fprintf (file, "%d %d\n", _width,_height);
     fprintf (file, "255\n");
     // the data
     // flip y so that (0,0) is bottom left corner
-    for (int y = height-1; y >= 0; y--) {
-        for (int x=0; x<width; x++) {
-            Vec3 v = GetPixel(x,y);
+    for (int y = _height-1; y >= 0; y--) {
+        for (int x=0; x<_width; x++) {
+            Vec3 v = get_pixel(x,y);
             fputc (ClampColorComponent(v.x),file);
             fputc (ClampColorComponent(v.y),file);
             fputc (ClampColorComponent(v.z),file);
@@ -142,7 +142,7 @@ void Image::SavePPM(const char *filename) const {
     fclose(file);
 }
 
-Image* Image::LoadPPM(const char *filename) {
+Image* Image::load_ppm(const char *filename) {
     assert(filename != NULL);
     // must end in .ppm
     const char *ext = &filename[strlen(filename)-4];
@@ -170,7 +170,7 @@ Image* Image::LoadPPM(const char *filename) {
             g = fgetc(file);
             b = fgetc(file);
             Vec3 color(r/255.0,g/255.0,b/255.0);
-            answer->SetPixel(x,y,color);
+            answer->set_pixel(x,y,color);
         }
     }
     fclose(file);
@@ -217,7 +217,7 @@ struct BMPHeader
                              are important */
 };
 int 
-Image::SaveBMP(const char *filename)
+Image::save_bmp(const char *filename)
 {
     int i, j, ipos;
     int bytesPerLine;
@@ -228,19 +228,19 @@ Image::SaveBMP(const char *filename)
 
     /* The length of each line must be a multiple of 4 bytes */
 
-    bytesPerLine = (3 * (width + 1) / 4) * 4;
+    bytesPerLine = (3 * (_width + 1) / 4) * 4;
 
     strcpy(bmph.bfType, "BM");
     bmph.bfOffBits = 54;
-    bmph.bfSize = bmph.bfOffBits + bytesPerLine * height;
+    bmph.bfSize = bmph.bfOffBits + bytesPerLine * _height;
     bmph.bfReserved = 0;
     bmph.biSize = 40;
-    bmph.biWidth = width;
-    bmph.biHeight = height;
+    bmph.biWidth = _width;
+    bmph.biHeight = _height;
     bmph.biPlanes = 1;
     bmph.biBitCount = 24;
     bmph.biCompression = 0;
-    bmph.biSizeImage = bytesPerLine * height;
+    bmph.biSizeImage = bytesPerLine * _height;
     bmph.biXPelsPerMeter = 0;
     bmph.biYPelsPerMeter = 0;
     bmph.biClrUsed = 0;       
@@ -272,11 +272,11 @@ Image::SaveBMP(const char *filename)
         return(0);
     }
 
-    for (i = 0; i < height ; i++)
+    for (i = 0; i < _height ; i++)
     {
-        for (j = 0; j < width; j++)
+        for (j = 0; j < _width; j++)
         {
-            ipos = (width * i + j);
+            ipos = (_width * i + j);
             line[3*j] = ClampColorComponent(rgb[ipos].z);
             line[3*j+1] =ClampColorComponent( rgb[ipos].y);
             line[3*j+2] = ClampColorComponent( rgb[ipos].x);
@@ -290,12 +290,12 @@ Image::SaveBMP(const char *filename)
     return(1);
 }
 
-void Image::SaveImage(const char * filename)
+void Image::save_image(const char * filename)
 {
 	int len = strlen(filename);
 	if(strcmp(".bmp", filename+len-4)==0){
-		SaveBMP(filename);
+		save_bmp(filename);
 	}else{
-		SaveTGA(filename);
+		save_tga(filename);
 	}
 }

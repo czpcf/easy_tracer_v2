@@ -30,6 +30,7 @@
 #include "../resource/emittor.hpp"
 #include "../resource/resource_light_direction.hpp"
 #include "../resource/resource_light_point.hpp"
+#include "../resource/resource_light_triangle.hpp"
 #include "../resource/resource_mesh.hpp"
 #include "../resource/resource_plane.hpp"
 #include "../resource/resource_sphere.hpp"
@@ -48,8 +49,10 @@
 class SceneParser {
 public:
 
-    SceneParser() = delete;
+    SceneParser();
     SceneParser(const char *filename);
+
+    void init(const char *filename);
 
     ~SceneParser();
 
@@ -81,6 +84,10 @@ public:
     int tot_in_group_light_direction();
     ResourceGroupLightDirection *get_group_light_direction(int n);
 
+    int n_group_light_triangle();
+    int tot_in_group_light_triangle();
+    ResourceGroupLightTriangle *get_group_light_triangle(int n);
+
     Accel *build_accel();
 
     /// @brief if the hit indicates a light
@@ -91,6 +98,12 @@ public:
 
     /// @brief if hit is NOT LIGHT, return light info
     Resource *get_info(const RayHit &hit);
+
+    /// @brief return a random light and set pdf
+    void get_random_light(RNG *rng, ResourceLight *&light, float &pdf);
+
+    /// @brief return pdf of choosing this light
+    float get_pdf_random_light(const RayHit &hit);
 
 private:
 
@@ -103,7 +116,8 @@ private:
     void parse_directional_light();
 
     void parse_materials();
-    void parse_material_lambertian();
+    void parse_material_phong();
+    void parse_bxdf_lambertian();
 
     void parse_group(int current_index, Mat3 T);
     void parse_object(int current_index, Mat3 T, char token[MAX_PARSER_TOKEN_LENGTH]);
@@ -111,11 +125,13 @@ private:
     void parse_plane(int current_index, Mat3 T);
     void parse_triangle(int current_index, Mat3 T);
     void parse_triangle_mesh(int current_index, Mat3 T);
+    void parse_triangle_light();
     void parse_transform(int current_index, Mat3 T);
 
     int get_num_materials();
 
     int get_token(char token[MAX_PARSER_TOKEN_LENGTH]);
+    void get_token_expect(char token[MAX_PARSER_TOKEN_LENGTH], const char *expect);
 
     Vec3 read_vec3();
     float read_float();
@@ -130,6 +146,7 @@ private:
 
     std::vector<ResourceGroupLightPoint*> group_light_point;
     std::vector<ResourceGroupLightDirection*> group_light_direction;
+    std::vector<ResourceGroupLightTriangle*> group_light_triangle;
     std::vector<ResourceGroupSphere*> group_sphere;
     std::vector<ResourceGroupPlane*> group_plane;
     std::vector<ResourceGroupMesh*> group_mesh;

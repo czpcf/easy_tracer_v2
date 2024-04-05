@@ -45,6 +45,21 @@ bool AccelNaive::if_inter_dis(const Ray &ray, float dis) {
     return false;
 }
 
+
+bool AccelNaive::if_inter_id(const Ray &ray, int id) {
+    RayHit hit;
+    hit.set(-1, 1e38, Vec2());
+    int n = boxes.size();
+    bool yes = false;
+    for(int i = 0; i < n; ++i) {
+        if(shapes[i]->inter_update(ray, hit)) {
+            hit.set_id(i);
+            yes = true;
+        }
+    }
+    return (yes & (hit.get_id() == id));
+}
+
 void AccelNaive::build() {
     // do nothing
 }

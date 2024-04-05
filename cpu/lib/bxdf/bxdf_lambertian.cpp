@@ -8,5 +8,5 @@ BxdfLambertian::BxdfLambertian(const Vec3 &n) {
 }
 
 Vec3 BxdfLambertian::phase(const Vec3 &dir_in, const Vec3 &dir_out, const Vec3 &norm) {
-    return alpha;
+    return alpha / PI;
 }

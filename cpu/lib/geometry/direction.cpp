@@ -21,6 +21,10 @@ bool Direction::if_inter_dis(const Ray &, float) {
     return false;
 }
 
+Vec2 Direction::inter_to_local(const Vec3 &) {
+    return Vec2(0.0f, 0.0f);
+}
+
 void Direction::trans(Mat3 &T) {
     d = T.map_scale(d);
     d.normalize();

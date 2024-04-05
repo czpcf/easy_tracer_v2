@@ -7,6 +7,7 @@ bxdf
 #include "../tensor/vec2.hpp"
 #include "../tensor/vec3.hpp"
 #include "../tensor/mat3.hpp"
+#include "../const.hpp"
 
 class Bxdf {
 public:

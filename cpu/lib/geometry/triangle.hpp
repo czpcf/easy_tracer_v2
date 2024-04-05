@@ -28,6 +28,9 @@ public:
     /// distance should be squared
     bool if_inter_dis(const Ray &, float) override;
 
+    /// @brief convert intersecion into local
+    Vec2 inter_to_local(const Vec3 &) override;
+
     /// @brief apply the transform to the geometry permanently
     void trans(Mat3& T) override;
 
@@ -43,13 +46,22 @@ public:
     /// @brief return norm
     const Vec3 get_norm() const;
 
+    /// @brief return p1
+    const Vec3 get_p1() const;
+
+    /// @brief return p2
+    const Vec3 get_p2() const;
+
+    /// @brief return p3
+    const Vec3 get_p3() const;
+
 private:
     /// @brief fast pre-calculation
     unsigned short type;
     /// @brief area
     float _area;
     /// @brief 3 vertices of the triangle
-    Vec3 p1, p2, p3;
+    Vec3 _p1, _p2, _p3;
     /// @brief normal of the triangle
     Vec3 norm;
 };

@@ -25,8 +25,8 @@ public:
     /// @brief given dir_out and normal, set dir_in and pdf
     virtual void sample_in(RNG *rng, const Vec3 &dir_out, const Vec3 &norm, Vec3 &dir_in, float &pdf);
 
-    /// @brief given dir_in, dir_out and normal, set pdf
-    virtual float pdf(RNG *rng, const Vec3 &dir_in, const Vec3 &dir_out, const Vec3 &norm);
+    /// @brief set sampled direction pdf
+    virtual float pdf(const Vec3 &given, const Vec3 &sampled, const Vec3 &norm);
 
     /// @brief if the sampler is specular
     virtual bool is_specular();
