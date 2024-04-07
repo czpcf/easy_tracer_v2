@@ -1,6 +1,7 @@
 #ifndef CONST_H
 #define CONST_H
 #define PI 3.1415926535897932384626433832795f
+#define INV_PI 0.31830988618379067153776752674503
 
 typedef unsigned int uint;
 #endif

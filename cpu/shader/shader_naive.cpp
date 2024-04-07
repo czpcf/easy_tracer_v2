@@ -11,8 +11,8 @@ using namespace std;
 SceneParser parser;
 Accel *accel;
 
-const uint max_depth = 10;
-const uint samples = 1024;
+const uint max_depth = 4;
+const uint samples = 128;
 
 // offset the ray to prevent intersecting with the last face
 static Vec3 offset(const Vec3 &ori, const Vec3 &d) {
@@ -21,7 +21,6 @@ static Vec3 offset(const Vec3 &ori, const Vec3 &d) {
 
 // https://www.pbr-book.org/4ed/Light_Transport_I_Surface_Reflection/The_Light_Transport_Equation
 Vec3 mc(Vec3 ori, Vec3 dir, RNG *rng) {
-    Vec3 product_color(1.0f, 1.0f, 1.0f); // product of colors/textures
     Vec3 product_bxdf(1.0f, 1.0f, 1.0f); // product of bxdfs
     float product_pdf = 1.0f; // product of pdf
     float product_beta = 1.0f; // product of cos<norm, light_to_surface>
@@ -33,29 +32,37 @@ Vec3 mc(Vec3 ori, Vec3 dir, RNG *rng) {
             break;
         }
 
-        Vec3 color, normal;
+        Vec3 normal;
         Bxdf *bxdf;
         Sampler *sampler;
+        Surface surface;
         if(parser.is_light(hit)) {
             auto info = parser.get_light_info(hit);
             Vec3 emittor = info->get_emittor();
-            info->get_all(hit.get_local(), color, normal, bxdf, sampler);
+            surface = info->get_surface(hit.get_local());
+            normal = surface.get_normal();
+            bxdf = surface.get_bxdf();
+            sampler = surface.get_sampler();
 
             // if light CAN generate THIS ray
             if(info->get_light()->pdf_ray(Ray(hit.get_inter(ray), -dir)) > 0) {
-                radiance += emittor * product_color * product_bxdf * product_beta / fmax(product_pdf, 1e-6);
+                radiance += emittor * product_bxdf * product_beta / fmax(product_pdf, 1e-6);
             }
         } else {
             auto info = parser.get_info(hit);
-            info->get_all(hit.get_local(), color, normal, bxdf, sampler);
+            surface = info->get_surface(hit.get_local());
+            normal = surface.get_normal();
+            bxdf = surface.get_bxdf();
+            sampler = surface.get_sampler();
         }
-        product_color *= color;
         Vec3 dir_in; // direction from intersection to light
         float pdf;
-        sampler->sample_in(rng, -dir, normal, dir_in, pdf);
+        if(sampler->sample_in(surface, rng, -dir, dir_in, pdf) == false) {
+            break;
+        }
         product_pdf *= pdf;
-        product_bxdf *= bxdf->phase(dir_in, -dir, normal);
-        Vec3 g = bxdf->phase(dir_in, -dir, normal);
+        product_bxdf *= bxdf->phase(surface, dir_in, -dir, normal);
+        Vec3 g = bxdf->phase(surface, dir_in, -dir, normal);
         product_beta *= fabs(normal.dot(dir_in));
 
         ori = hit.get_inter(ray);
@@ -79,7 +86,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (argc != 3) {
-        cout << "Usage: ./bin/PA1 <input scene file> <output bmp file>" << endl;
+        cout << "Usage: <input scene file> <output bmp file>" << endl;
         return 1;
     }
     string inputFile = argv[1];

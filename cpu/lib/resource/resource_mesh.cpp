@@ -25,23 +25,19 @@ UV ResourceTriangle::local_to_uv(const Vec2 &local) {
     return uv1 * t1 + uv2 * t2 + uv3 * t3;
 }
 
-Vec3 ResourceTriangle::get_color(const Vec2 &local, const UV &uv) {
-    return texture->get(uv);
-}
-
-Vec3 ResourceTriangle::get_normal(const Vec2 &local, const UV &uv) {
-    float t1 = local.x;
-    float t3 = local.y;
-    float t2 = 1.0f - t1 - t3;
-    return (norm1 * t1 + norm2 * t2 + norm3).norm();
-}
-
-Bxdf *ResourceTriangle::get_bxdf(const Vec2 &local, const UV &uv) {
-    return bxdf;
-}
-
-Sampler *ResourceTriangle::get_sampler(const Vec2 &local, const UV &uv) {
-    return sampler;
+Surface ResourceTriangle::get_surface(const Vec2 &local) {
+    Vec3 norm = triangle->get_norm();
+    Vec3 x = (triangle->get_p2() - triangle->get_p1()).norm();
+    Vec3 y = norm.cross(x);
+    UV uv = local_to_uv(local);
+    return Surface(
+        norm,
+        x,
+        y,
+        texture->get(uv),
+        bxdf,
+        sampler
+    );
 }
 
 Geometry *ResourceTriangle::get_shape() {

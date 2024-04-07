@@ -26,7 +26,7 @@ public:
     void operator/=(const Vec3 &b);
 
     /// @brief return the element-wise product: (a.x * b.x, a.y * b.y, a.z * b.z)
-    Vec3 operator*(const Vec3 &b);
+    const Vec3 operator*(const Vec3 &b) const;
 
     /// @brief return the cross product: a x b
     Vec3 cross(const Vec3 &b);
@@ -66,6 +66,12 @@ public:
 
     /// @brief return min(x,y,z)
     float min();
+
+    /// @brief return (1 - t) * a + t * b
+    static Vec3 lerp(const Vec3 &a, const Vec3 &b, float t);
+
+    /// @brief if any value is nan or inf
+    const bool have_bad() const;
 };
 
 /// @brief return a x b if a and b is not on a line,

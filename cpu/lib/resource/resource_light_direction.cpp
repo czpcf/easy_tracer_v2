@@ -20,26 +20,10 @@ UV ResourceLightDirection::local_to_uv(const Vec2 &) {
     return UV();
 }
 
-Vec3 ResourceLightDirection::get_color(const Vec2 &, const UV &) {
-    return texture->get(UV());
-}
-
-Vec3 ResourceLightDirection::get_normal(const Vec2 &, const UV &) {
-    fprintf(stderr, "cannot compute normal on directional light!\n");
+Surface ResourceLightDirection::get_surface(const Vec2 &local) {
+    fprintf(stderr, "cannot get surface info of light point !\n");
     assert(0);
-    return Vec3();
-}
-
-Bxdf *ResourceLightDirection::get_bxdf(const Vec2 &, const UV &) {
-    fprintf(stderr, "cannot get bxdf on directional light!\n");
-    assert(0);
-    return nullptr;
-}
-
-Sampler *ResourceLightDirection::get_sampler(const Vec2 &, const UV &) {
-    fprintf(stderr, "cannot get sampler on directional light!\n");
-    assert(0);
-    return nullptr;
+    return Surface();
 }
 
 Vec3 ResourceLightDirection::get_emittor() {

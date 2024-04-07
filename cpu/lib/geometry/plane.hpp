@@ -46,6 +46,12 @@ public:
     /// @brief return z-axis
     const Vec3 &get_z() const;
 
+    /// @brief return z-axis
+    const Vec3 &get_x() const;
+
+    /// @brief return z-axis
+    const Vec3 &get_y() const;
+
 private:
 
     Vec3 origin;

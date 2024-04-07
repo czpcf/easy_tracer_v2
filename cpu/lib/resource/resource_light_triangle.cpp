@@ -20,20 +20,19 @@ UV ResourceLightTriangle::local_to_uv(const Vec2 &) {
     return UV();
 }
 
-Vec3 ResourceLightTriangle::get_color(const Vec2 &, const UV &) {
-    return texture->get(UV());
-}
-
-Vec3 ResourceLightTriangle::get_normal(const Vec2 &, const UV &) {
-    return light_triangle->get_norm();
-}
-
-Bxdf *ResourceLightTriangle::get_bxdf(const Vec2 &, const UV &) {
-    return bxdf;
-}
-
-Sampler *ResourceLightTriangle::get_sampler(const Vec2 &, const UV &) {
-    return sampler;
+Surface ResourceLightTriangle::get_surface(const Vec2 &local) {
+    Vec3 norm = light_triangle->get_norm();
+    Vec3 x = (light_triangle->get_p2() - light_triangle->get_p1()).norm();
+    Vec3 y = norm.cross(x);
+    UV uv = local_to_uv(local);
+    return Surface(
+        norm,
+        x,
+        y,
+        texture->get(uv),
+        bxdf,
+        sampler
+    );
 }
 
 Vec3 ResourceLightTriangle::get_emittor() {

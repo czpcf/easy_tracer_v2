@@ -3,10 +3,12 @@
 
 #include "const.hpp"
 
+#include "accel/accel_bvh.cpp"
 #include "accel/accel_naive.cpp"
 #include "accel/accel.cpp"
 #include "accel/box.hpp"
 
+#include "bxdf/bxdf_ggx.hpp"
 #include "bxdf/bxdf_lambertian.hpp"
 #include "bxdf/bxdf_phong.hpp"
 #include "bxdf/bxdf.hpp"
@@ -46,6 +48,7 @@
 #include "resource/resource.hpp"
 
 #include "sampler/onb.hpp"
+#include "sampler/sampler_ggx.hpp"
 #include "sampler/sampler_lambertian.hpp"
 #include "sampler/sampler_reflection.hpp"
 #include "sampler/sampler_refraction.hpp"

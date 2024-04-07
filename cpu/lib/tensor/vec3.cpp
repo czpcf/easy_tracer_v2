@@ -74,7 +74,7 @@ Vec3 Vec3::cross(const Vec3&b) {
                 x * b.y - y * b.x);
 }
 
-Vec3 Vec3::operator*(const Vec3 &b) {
+const Vec3 Vec3::operator*(const Vec3 &b) const {
     return Vec3(x * b.x, y * b.y, z * b.z);
 }
 
@@ -159,6 +159,15 @@ Vec3 CrossSafe(Vec3 a, Vec3 b) {
         c.z = (a.x + a.y) / a.z;
     }
     return c;
+}
+
+const bool Vec3::have_bad() const {
+    return std::isnan(x) | std::isnan(y) | std::isnan(z) |
+           std::isinf(x) | std::isinf(y) | std::isinf(z);
+}
+
+Vec3 Vec3::lerp(const Vec3 &a, const Vec3 &b, float t) {
+    return a * (1.0f - t) * b * t;
 }
 
 Vec3 min(Vec3 a, Vec3 b) {

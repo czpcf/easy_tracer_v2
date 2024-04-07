@@ -3,16 +3,18 @@
 Sampler::Sampler() {
 }
 
-void Sampler::sample_out(RNG *rng, const Vec3 &dir_in, const Vec3 &norm, Vec3 &dir_out, float &pdf) {
+bool Sampler::sample_out(const Surface &surface, RNG *rng, const Vec3 &dir_in, Vec3 &dir_out, float &pdf) {
+    return false;
 }
 
-void Sampler::sample_in(RNG *rng, const Vec3 &dir_out, const Vec3 &norm, Vec3 &dir_in, float &pdf) {
+bool Sampler::sample_in(const Surface &surface, RNG *rng, const Vec3 &dir_out, Vec3 &dir_in, float &pdf) {
+    return false;
 }
 
-float Sampler::pdf(const Vec3 &dir_in, const Vec3 &dir_out, const Vec3 &norm) {
+float Sampler::pdf(const Surface &surface, const Vec3 &dir_in, const Vec3 &dir_out) {
     return 0.0f;
 }
 
 bool Sampler::is_specular() {
-    return false;
+    return true;
 }

@@ -8,12 +8,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fopenmp -Wall")
 
 set(SOURCE_FILES
+    lib/accel/accel_bvh.cpp
     lib/accel/accel_naive.cpp
     lib/accel/accel.cpp
     lib/accel/box.cpp
-    lib/bxdf/bxdf.cpp
+    lib/bxdf/bxdf_ggx.cpp
     lib/bxdf/bxdf_lambertian.cpp
     lib/bxdf/bxdf_phong.cpp
+    lib/bxdf/bxdf.cpp
     lib/camera/camera_perspective.cpp
     lib/camera/camera.cpp
     lib/geometry/direction.cpp
@@ -40,7 +42,9 @@ set(SOURCE_FILES
     lib/resource/resource_plane.cpp
     lib/resource/resource_sphere.cpp
     lib/resource/resource.cpp
+    lib/resource/surface.cpp
     lib/sampler/onb
+    lib/sampler/sampler_ggx.cpp
     lib/sampler/sampler_lambertian.cpp
     lib/sampler/sampler_reflection.cpp
     lib/sampler/sampler_refraction.cpp
@@ -68,9 +72,6 @@ target_link_libraries(test_intersection PRIVATE easy_tracer_v2_lib)
 
 add_executable(test_rand test/test_rand.cpp)
 target_link_libraries(test_rand PRIVATE easy_tracer_v2_lib)
-
-add_executable(test_sampler test/test_sampler.cpp)
-target_link_libraries(test_sampler PRIVATE easy_tracer_v2_lib)
 
 add_executable(test_vector test/test_vector.cpp)
 target_link_libraries(test_vector PRIVATE easy_tracer_v2_lib)

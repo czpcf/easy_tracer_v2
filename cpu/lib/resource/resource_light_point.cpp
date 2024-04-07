@@ -20,26 +20,10 @@ UV ResourceLightPoint::local_to_uv(const Vec2 &) {
     return UV();
 }
 
-Vec3 ResourceLightPoint::get_color(const Vec2 &, const UV &) {
-    return texture->get(UV());
-}
-
-Vec3 ResourceLightPoint::get_normal(const Vec2 &, const UV &) {
-    fprintf(stderr, "cannot compute normal on point light!\n");
+Surface ResourceLightPoint::get_surface(const Vec2 &local) {
+    fprintf(stderr, "cannot get surface info of light point !\n");
     assert(0);
-    return Vec3();
-}
-
-Bxdf *ResourceLightPoint::get_bxdf(const Vec2 &, const UV &) {
-    fprintf(stderr, "cannot get bxdf on point light!\n");
-    assert(0);
-    return nullptr;
-}
-
-Sampler *ResourceLightPoint::get_sampler(const Vec2 &, const UV &) {
-    fprintf(stderr, "cannot get sampler on point light!\n");
-    assert(0);
-    return nullptr;
+    return Surface();
 }
 
 Vec3 ResourceLightPoint::get_emittor() {

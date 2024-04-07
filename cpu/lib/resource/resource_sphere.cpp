@@ -17,24 +17,26 @@ UV ResourceSphere::local_to_uv(const Vec2 &local) {
     return Vec2(local.x / PI, local.y / (2.0f * PI));
 }
 
-Vec3 ResourceSphere::get_color(const Vec2 &local, const UV &uv) {
-    return texture->get(uv);
-}
-
-Vec3 ResourceSphere::get_normal(const Vec2 &local, const UV &uv) {
+/// TODO: check the correctness
+Surface ResourceSphere::get_surface(const Vec2 &local) {
     float theta = local.x;
     float phi = local.y;
-    return sphere->z_axis() * std::cos(theta) +
+    Vec3 normal = sphere->z_axis() * std::cos(theta) +
            sphere->x_axis() * std::sin(theta) * std::cos(phi) +
            sphere->y_axis() * std::sin(theta) * std::sin(phi);
-}
-
-Bxdf *ResourceSphere::get_bxdf(const Vec2 &local, const UV &uv) {
-    return bxdf;
-}
-
-Sampler *ResourceSphere::get_sampler(const Vec2 &local, const UV &uv) {
-    return sampler;
+    Vec3 y = sphere->z_axis() * std::sin(theta) -
+           sphere->x_axis() * std::cos(theta) * std::cos(phi) -
+           sphere->y_axis() * std::cos(theta) * std::sin(phi);
+    UV uv = local_to_uv(local);
+    Vec3 x = y.cross(normal);
+    return Surface(
+        normal,
+        x,
+        y,
+        texture->get(uv),
+        bxdf,
+        sampler
+    );
 }
 
 Geometry *ResourceSphere::get_shape() {

@@ -20,17 +20,8 @@ public:
     /// @brief return uv coordinate of the n-th shape according to the local coordinate
     UV local_to_uv(const Vec2 &) override;
 
-    /// @brief return color of the n-th shape according to local & uv
-    Vec3 get_color(const Vec2 &, const UV &) override;
-
-    /// @brief return normal of the n-th shape according to local & uv
-    Vec3 get_normal(const Vec2 &, const UV &) override;
-
-    /// @brief return bxdf of the n-th shape according to local & uv
-    Bxdf *get_bxdf(const Vec2 &, const UV &) override;
-
-    /// @brief return sampler of the n-th shape according to local & uv
-    Sampler *get_sampler(const Vec2 &, const UV &) override;
+    /// @brief return surface info
+    Surface get_surface(const Vec2 &local) override;
 
     /// @brief return emittor
     Vec3 get_emittor() override;

@@ -92,3 +92,15 @@ float LightTriangle::decaying(const Vec3 &p_on_suf, const Vec3 &p_on_light) {
 const Vec3 LightTriangle::get_norm() const {
     return triangle.get_norm();
 }
+
+const Vec3 LightTriangle::get_p1() const {
+    return triangle.get_p1();
+}
+
+const Vec3 LightTriangle::get_p2() const {
+    return triangle.get_p2();
+}
+
+const Vec3 LightTriangle::get_p3() const {
+    return triangle.get_p3();
+}

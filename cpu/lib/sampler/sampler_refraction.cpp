@@ -8,8 +8,9 @@ SamplerRefraction::SamplerRefraction(float eta) {
     n = eta;
 }
 
-void SamplerRefraction::sample_out(RNG *rng, const Vec3 &dir_in, const Vec3 &norm, Vec3 &dir_out, float &pdf) {
+bool SamplerRefraction::sample_out(const Surface &surface, RNG *rng, const Vec3 &dir_in, Vec3 &dir_out, float &pdf) {
     pdf = -1.0f;
+    Vec3 norm = surface.get_normal();
     float cos_wi = norm.dot(dir_in);
     if(cos_wi > 0.0f) { // into the material
         float cos_theta = std::sqrt((cos_wi * cos_wi - 1.0f) / n / n + 1.0f);
@@ -25,13 +26,14 @@ void SamplerRefraction::sample_out(RNG *rng, const Vec3 &dir_in, const Vec3 &nor
         }
     }
     dir_out.normalize();
+    return true;
 }
 
-void SamplerRefraction::sample_in(RNG *rng, const Vec3 &dir_out, const Vec3 &norm, Vec3 &dir_in, float &pdf) {
-    sample_out(rng, dir_out, norm, dir_in, pdf);
+bool SamplerRefraction::sample_in(const Surface &surface, RNG *rng, const Vec3 &dir_out, Vec3 &dir_in, float &pdf) {
+    return sample_out(surface, rng, dir_out, dir_in, pdf);
 }
 
-float SamplerRefraction::pdf(const Vec3 &, const Vec3 &, const Vec3 &norm) {
+float SamplerRefraction::pdf(const Surface &surface, const Vec3 &, const Vec3 &) {
     return 0.0f;
 }
 

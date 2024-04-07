@@ -1,15 +1,16 @@
 /*
-perfect reflection sampler
+ggx sampler
 */
-#ifndef SAMPLER_REFLECTION_H
-#define SAMPLER_REFLECTION_H
+#ifndef SAMPLER_GGX_H
+#define SAMPLER_GGX_H
 
 #include "sampler.hpp"
 
-class SamplerReflection: public Sampler {
+class SamplerGGX: public Sampler {
 public:
-    SamplerReflection();
-    ~SamplerReflection() override = default;
+    SamplerGGX();
+    SamplerGGX(float _r, float _x, float _y);
+    ~SamplerGGX() override = default;
 
     /// @brief given dir_in and normal, set dir_out and pdf
     /// if return false, failed to sample
@@ -24,6 +25,12 @@ public:
     
     /// @brief if the sampler is specular
     bool is_specular() override;
+
+private:
+    float change_pdf;
+    float roughness;
+    float alpha_x;
+    float alpha_y;
 };
 
 #endif

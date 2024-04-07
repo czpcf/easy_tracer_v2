@@ -1,3 +1,7 @@
+/*
+WARNING: this shader is not physically based
+because it does not consider the cosine term upon intersection
+*/
 #include <iostream>
 #include "../lib/easy_tracer_v2.hpp"
 
@@ -9,7 +13,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (argc != 3) {
-        cout << "Usage: ./bin/PA1 <input scene file> <output bmp file>" << endl;
+        cout << "Usage: <input scene file> <output bmp file>" << endl;
         return 1;
     }
     string inputFile = argv[1];
@@ -37,33 +41,15 @@ int main(int argc, char *argv[]) {
                 }
                 auto info = parser.get_info(hit);
 
-                Vec3 inter, norm, color;
-
                 // get intersection on the surface
-                inter = hit.get_inter(camRay);
-
-                UV uv;
-                Sampler *sampler = nullptr;
-                Bxdf *bxdf = nullptr;
-
+                Vec3 inter = hit.get_inter(camRay);
 
                 // change local coordinate into uv coordinate
-                uv = info->local_to_uv(hit.get_local());
-                
-                // get the normal on the surface
-                norm = info->get_normal(hit.get_local(), uv);
-                
-                // get the sampler on the surface, although its useless here
-                sampler = info->get_sampler(hit.get_local(), uv);
-                
-                // get the bxdf on the surface
-                bxdf = info->get_bxdf(hit.get_local(), uv);
+                UV uv = info->local_to_uv(hit.get_local());
 
-                // get the texture color
-                color = info->get_color(hit.get_local(), uv);
-
-                // // or equivalently:
-                // info->get_all(hit.get_local(), color, norm, bxdf, sampler);
+                // get surface information
+                Surface surface = info->get_surface(hit.get_local());
+                Vec3 norm = surface.get_normal();
 
                 // radiance to be calculated
                 Vec3 radiance = Vec3(0.0f, 0.0f, 0.0f);
@@ -97,7 +83,7 @@ int main(int argc, char *argv[]) {
                         Vec3 emittor = info_light->get_emittor();
 
                         // calculate color
-                        radiance += emittor * bxdf->phase(suf_to_light, suf_to_eye, norm);
+                        radiance += emittor * surface.get_bxdf()->phase(surface, suf_to_light, suf_to_eye, norm);
                     }
                 }
                 
@@ -115,13 +101,13 @@ int main(int argc, char *argv[]) {
                         Vec3 suf_to_light = (p_light - inter).norm();
                         Vec3 suf_to_eye = -camRay.get_direction();
                         Vec3 emittor = info_light->get_emittor();
-                        radiance += emittor * bxdf->phase(suf_to_light, suf_to_eye, norm);
+                        radiance += emittor * surface.get_bxdf()->phase(surface, suf_to_light, suf_to_eye, norm);
                     }
                 }
 
-                Vec3 g = radiance * color;
+                Vec3 g = radiance;
                 // convert radiance to final color
-                image.set_pixel(x, y, radiance * color);
+                image.set_pixel(x, y, radiance);
             } else {
                 image.set_pixel(x, y, parser.get_background_color());
             }

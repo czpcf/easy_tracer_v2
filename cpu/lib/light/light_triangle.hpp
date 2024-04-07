@@ -52,6 +52,12 @@ public:
 
     const Vec3 get_norm() const;
 
+    const Vec3 get_p1() const;
+
+    const Vec3 get_p2() const;
+
+    const Vec3 get_p3() const;
+
 protected:
     Triangle triangle;
 };

@@ -1,16 +1,16 @@
 /*
-naive accel
-just using array
+bvh accel
 */
-#ifndef ACCEL_NAIVE_H
-#define ACCEL_NAIVE_H
+#ifndef ACCEL_BVH_H
+#define ACCEL_BVH_H
 
 #include "accel.hpp"
+#include "../random/random_mt19937.hpp"
 
-class AccelNaive: public Accel {
+class AccelBVH: public Accel {
 public:
-    AccelNaive();
-    ~AccelNaive() override = default;
+    AccelBVH();
+    ~AccelBVH() override = default;
 
     /// @brief set size of elements
     void set_size(int n) override;
@@ -36,5 +36,20 @@ public:
     
     /// @brief build accelerator
     void build() override;
+
+private:
+    /// @brief build tree, using surface area heuristic
+    void build_tree(uint l, uint r, uint &tot, RNGMT19937 &rng, uint dep);
+
+    /// @brief actual id for pointers
+    std::vector<int>id;
+
+    std::vector<uint> rs;
+    std::vector<uint> nxt;
+    std::vector<Geometry*> shapes_this;
+    std::vector<std::pair<Box, uint> > aux_boxes;
+    std::vector<Box> aux_boxes_buf;
+    uint height;
+    uint have;
 };
 #endif

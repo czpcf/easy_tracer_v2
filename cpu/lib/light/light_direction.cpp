@@ -23,8 +23,9 @@ void LightDirection::sample_ray(RNG *rng, Ray &ray, float &pdf, Vec2 &local) {
     local = Vec2(0.0f, 0.0f);
 }
 
+/// TODO: precision
 bool LightDirection::sample_in_ray(RNG *rng, const Vec3 &p_on_suf, Ray &ray, float &pdf, Vec2 &local) {
-    ray = Ray(p_on_suf - d.get_d() * 65535.0f, d.get_d());
+    ray = Ray(p_on_suf - d.get_d() * 1024.0f, d.get_d());
     pdf = -1.0f;
     local = Vec2(0.0f, 0.0f);
     return true;
@@ -43,7 +44,7 @@ Geometry *LightDirection::get_shape() {
 }
 
 bool LightDirection::is_specular() {
-    return false;
+    return true;
 }
 
 float LightDirection::decaying(const Vec3 &p_on_suf, const Vec3 &p_on_light) {

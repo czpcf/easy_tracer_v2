@@ -95,3 +95,11 @@ float Plane::area() {
 const Vec3 &Plane::get_z() const {
     return z;
 }
+
+const Vec3 &Plane::get_x() const {
+    return x;
+}
+
+const Vec3 &Plane::get_y() const {
+    return y;
+}

@@ -26,23 +26,11 @@ public:
     /// @brief return uv coordinate of the n-th shape according to the local coordinate
     virtual UV local_to_uv(const Vec2 &) = 0;
 
-    /// @brief return color of the n-th shape according to local & uv
-    virtual Vec3 get_color(const Vec2 &, const UV &);
-
-    /// @brief return normal of the n-th shape according to local & uv
-    virtual Vec3 get_normal(const Vec2 &, const UV &);
-
-    /// @brief return bxdf of the n-th shape according to local & uv
-    virtual Bxdf *get_bxdf(const Vec2 &, const UV &) = 0;
-
-    /// @brief return sampler of the n-th shape according to local & uv
-    virtual Sampler *get_sampler(const Vec2 &, const UV &) = 0;
+    /// @brief return surface info
+    virtual Surface get_surface(const Vec2 &local) = 0;
 
     /// @brief return the shape
     virtual Geometry *get_shape() = 0;
-
-    /// @brief get color, normal, bxdf and sampler
-    void get_all(const Vec2 &local, Vec3 &color, Vec3 &normal, Bxdf *&bxdf, Sampler *&sampler);
 };
 
 class ResourceGroup {

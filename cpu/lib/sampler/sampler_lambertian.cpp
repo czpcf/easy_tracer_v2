@@ -3,7 +3,8 @@
 SamplerLambertian::SamplerLambertian() {
 }
 
-void SamplerLambertian::sample_out(RNG *rng, const Vec3 &dir_in, const Vec3 &norm, Vec3 &dir_out, float &pdf) {
+bool SamplerLambertian::sample_out(const Surface &surface, RNG *rng, const Vec3 &dir_in, Vec3 &dir_out, float &pdf) {
+    Vec3 norm = surface.get_normal();
     if(dir_in.dot(norm) > 0) {
         Onb onb(norm);
         onb.cosine_sample_hemisphere(rng);
@@ -15,9 +16,11 @@ void SamplerLambertian::sample_out(RNG *rng, const Vec3 &dir_in, const Vec3 &nor
         dir_out = onb.to_world();
         pdf = onb.pdf();
     }
+    return true;
 }
 
-void SamplerLambertian::sample_in(RNG *rng, const Vec3 &dir_out, const Vec3 &norm, Vec3 &dir_in, float &pdf) {
+bool SamplerLambertian::sample_in(const Surface &surface, RNG *rng, const Vec3 &dir_out, Vec3 &dir_in, float &pdf) {
+    Vec3 norm = surface.get_normal();
     if(dir_out.dot(norm) > 0) {
         Onb onb(norm);
         onb.cosine_sample_hemisphere(rng);
@@ -29,10 +32,11 @@ void SamplerLambertian::sample_in(RNG *rng, const Vec3 &dir_out, const Vec3 &nor
         dir_in = onb.to_world();
         pdf = onb.pdf();
     }
+    return true;
 }
 
-float SamplerLambertian::pdf(const Vec3 &given, const Vec3 &sampled, const Vec3 &norm) {
-    return Onb::pdf_cosine_sample_hemisphere(sampled, norm);
+float SamplerLambertian::pdf(const Surface &surface, const Vec3 &given, const Vec3 &sampled) {
+    return Onb::pdf_cosine_sample_hemisphere(sampled, surface.get_normal());
 }
 
 bool SamplerLambertian::is_specular() {

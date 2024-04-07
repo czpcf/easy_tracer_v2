@@ -12,6 +12,7 @@ pdf will be set to -1 if specular
 #include "../tensor/mat3.hpp"
 #include "../const.hpp"
 #include "../random/random.hpp"
+#include "../bxdf/bxdf.hpp"
 #include "onb.hpp"
 
 class Sampler {
@@ -20,13 +21,15 @@ public:
     virtual ~Sampler() = default;
 
     /// @brief given dir_in and normal, set dir_out and pdf
-    virtual void sample_out(RNG *rng, const Vec3 &dir_in, const Vec3 &norm, Vec3 &dir_out, float &pdf);
+    /// if return false, failed to sample
+    virtual bool sample_out(const Surface &surface, RNG *rng, const Vec3 &dir_in, Vec3 &dir_out, float &pdf);
 
     /// @brief given dir_out and normal, set dir_in and pdf
-    virtual void sample_in(RNG *rng, const Vec3 &dir_out, const Vec3 &norm, Vec3 &dir_in, float &pdf);
+    /// if return false, failed to sample
+    virtual bool sample_in(const Surface &surface, RNG *rng, const Vec3 &dir_out, Vec3 &dir_in, float &pdf);
 
     /// @brief set sampled direction pdf
-    virtual float pdf(const Vec3 &given, const Vec3 &sampled, const Vec3 &norm);
+    virtual float pdf(const Surface &surface, const Vec3 &given, const Vec3 &sampled);
 
     /// @brief if the sampler is specular
     virtual bool is_specular();

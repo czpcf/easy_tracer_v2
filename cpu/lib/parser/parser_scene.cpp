@@ -191,6 +191,8 @@ void SceneParser::parse_materials() {
             parse_material_phong();
         } else if (strcmp(token, "bxdfLambertian") == 0) {
             parse_bxdf_lambertian();
+        } else if (strcmp(token, "bxdfGGX") == 0) {
+            parse_bxdf_ggx();
         } else {
             printf("Unknown token in parseMaterial: '%s'\n", token);
             exit(0);
@@ -239,9 +241,32 @@ void SceneParser::parse_bxdf_lambertian() {
     Vec3 color = read_vec3();
     get_token_expect(token, "}");
 
-    auto *bxdf = new BxdfLambertian(color);
+    auto *bxdf = new BxdfLambertian();
     auto *sampler = new SamplerLambertian();
-    auto *texture = new TextureSimple(Vec3(1.0f, 1.0f, 1.0f));
+    auto *texture = new TextureSimple(color);
+    bxdfs.push_back(bxdf);
+    samplers.push_back(sampler);
+    textures.push_back(texture);
+}
+
+void SceneParser::parse_bxdf_ggx() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    char filename[MAX_PARSER_TOKEN_LENGTH];
+    filename[0] = 0;
+    get_token_expect(token, "{");
+    get_token_expect(token, "alphaX");
+    float alpha_x = read_float();
+    get_token_expect(token, "alphaY");
+    float alpha_y = read_float();
+    get_token_expect(token, "roughness");
+    float roughness = read_float();
+    get_token_expect(token, "color");
+    Vec3 color = read_vec3();
+    get_token_expect(token, "}");
+
+    auto *bxdf = new BxdfGGX(roughness, alpha_x, alpha_y);
+    auto *sampler = new SamplerGGX(roughness, alpha_x, alpha_y);
+    auto *texture = new TextureSimple(color);
     bxdfs.push_back(bxdf);
     samplers.push_back(sampler);
     textures.push_back(texture);
@@ -603,7 +628,7 @@ int SceneParser::n_group_sphere() {
 
 int SceneParser::tot_in_group_sphere() {
     int n = 0;
-    for(int i = 0; i < group_sphere.size(); ++i) {
+    for(uint i = 0; i < group_sphere.size(); ++i) {
         n += group_sphere[i]->n_objects();
     }
     return n;
@@ -620,7 +645,7 @@ int SceneParser::n_group_light_point() {
 
 int SceneParser::tot_in_group_light_point() {
     int n = 0;
-    for(int i = 0; i < group_light_point.size(); ++i) {
+    for(uint i = 0; i < group_light_point.size(); ++i) {
         n += group_light_point[i]->n_objects();
     }
     return n;
@@ -637,7 +662,7 @@ int SceneParser::n_group_mesh() {
 
 int SceneParser::tot_in_group_mesh() {
     int n = 0;
-    for(int i = 0; i < group_mesh.size(); ++i) {
+    for(uint i = 0; i < group_mesh.size(); ++i) {
         n += group_mesh[i]->n_objects();
     }
     return n;
@@ -653,7 +678,7 @@ int SceneParser::n_group_plane() {
 
 int SceneParser::tot_in_group_plane() {
     int n = 0;
-    for(int i = 0; i < group_plane.size(); ++i) {
+    for(uint i = 0; i < group_plane.size(); ++i) {
         n += group_plane[i]->n_objects();
     }
     return n;
@@ -687,7 +712,7 @@ int SceneParser::n_group_light_triangle() {
 
 int SceneParser::tot_in_group_light_triangle() {
     int n = 0;
-    for(int i = 0; i < group_light_triangle.size(); ++i) {
+    for(uint i = 0; i < group_light_triangle.size(); ++i) {
         n += group_light_triangle[i]->n_objects();
     }
     return n;
@@ -702,7 +727,7 @@ ResourceGroupLightTriangle *SceneParser::get_group_light_triangle(int n) {
 template<typename T>
 void SceneParser::get_n_light(Accel *accel, std::vector<T *> &group) {
     int m = 0;
-    for(int i = 0; i < group.size(); ++i) {
+    for(uint i = 0; i < group.size(); ++i) {
         m += group[i]->n_objects();
     }
     n_tot += m;
@@ -712,7 +737,7 @@ void SceneParser::get_n_light(Accel *accel, std::vector<T *> &group) {
 template<typename T>
 void SceneParser::get_n(Accel *accel, std::vector<T *> &group) {
     int m = 0;
-    for(int i = 0; i < group.size(); ++i) {
+    for(uint i = 0; i < group.size(); ++i) {
         m += group[i]->n_objects();
     }
     n_tot += m;
@@ -720,9 +745,9 @@ void SceneParser::get_n(Accel *accel, std::vector<T *> &group) {
 
 template<typename T>
 void SceneParser::add_resource_light(Accel *accel, std::vector<T *> &group) {
-    for(int i = 0; i < group.size(); ++i) {
+    for(uint i = 0; i < group.size(); ++i) {
         accel->add(group[i]);
-        for(int j = 0; j < group[i]->n_objects(); ++j) {
+        for(uint j = 0; j < group[i]->n_objects(); ++j) {
             accel_resource_light.push_back(group[i]->get_info(j));
         }
     }
@@ -730,9 +755,9 @@ void SceneParser::add_resource_light(Accel *accel, std::vector<T *> &group) {
 
 template<typename T>
 void SceneParser::add_resource(Accel *accel, std::vector<T *> &group) {
-    for(int i = 0; i < group.size(); ++i) {
+    for(uint i = 0; i < group.size(); ++i) {
         accel->add(group[i]);
-        for(int j = 0; j < group[i]->n_objects(); ++j) {
+        for(uint j = 0; j < group[i]->n_objects(); ++j) {
             accel_resource.push_back(group[i]->get_info(j));
         }
     }
@@ -740,7 +765,8 @@ void SceneParser::add_resource(Accel *accel, std::vector<T *> &group) {
 
 Accel *SceneParser::build_accel() {
     // can change data structure here
-    AccelNaive *accel = new AccelNaive();
+    // AccelNaive *accel = new AccelNaive();
+    AccelBVH *accel = new AccelBVH();
 
     n_tot = 0;
     n_lights = 0;

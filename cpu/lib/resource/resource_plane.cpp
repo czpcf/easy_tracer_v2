@@ -17,20 +17,16 @@ UV ResourcePlane::local_to_uv(const Vec2 &local) {
     return UV(local.x, local.y);
 }
 
-Vec3 ResourcePlane::get_color(const Vec2 &local, const UV &uv) {
-    return texture->get(uv);
-}
-
-Vec3 ResourcePlane::get_normal(const Vec2 &local, const UV &uv) {
-    return plane->get_z();
-}
-
-Bxdf *ResourcePlane::get_bxdf(const Vec2 &local, const UV &uv) {
-    return bxdf;
-}
-
-Sampler *ResourcePlane::get_sampler(const Vec2 &local, const UV &uv) {
-    return sampler;
+Surface ResourcePlane::get_surface(const Vec2 &local) {
+    UV uv = local_to_uv(local);
+    return Surface(
+        plane->get_z(),
+        plane->get_x(),
+        plane->get_y(),
+        texture->get(uv),
+        bxdf,
+        sampler
+    );
 }
 
 Geometry *ResourcePlane::get_shape() {
