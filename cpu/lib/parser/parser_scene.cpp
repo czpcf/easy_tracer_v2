@@ -16,6 +16,7 @@ SceneParser::SceneParser(const char *filename) {
 }
 
 void SceneParser::init(const char *filename) {
+    parse_lines = 0;
     camera = nullptr;
     background_color = Vec3(0.0f, 0.0f, 0.0f);
 
@@ -193,6 +194,14 @@ void SceneParser::parse_materials() {
             parse_bxdf_lambertian();
         } else if (strcmp(token, "bxdfGGX") == 0) {
             parse_bxdf_ggx();
+        } else if (strcmp(token, "bxdfGTR1") == 0) {
+            parse_bxdf_gtr1();
+        } else if (strcmp(token, "bxdfDisney") == 0) {
+            parse_bxdf_disney();
+        } else if (strcmp(token, "bxdfReflection") == 0) {
+            parse_bxdf_reflection();
+        } else if (strcmp(token, "bxdfRefraction") == 0) {
+            parse_bxdf_refraction();
         } else {
             printf("Unknown token in parseMaterial: '%s'\n", token);
             exit(0);
@@ -272,6 +281,127 @@ void SceneParser::parse_bxdf_ggx() {
     textures.push_back(texture);
 }
 
+void SceneParser::parse_bxdf_gtr1() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    char filename[MAX_PARSER_TOKEN_LENGTH];
+    filename[0] = 0;
+    get_token_expect(token, "{");
+    get_token_expect(token, "alpha");
+    float alpha = read_float();
+    get_token_expect(token, "color");
+    Vec3 color = read_vec3();
+    get_token_expect(token, "}");
+
+    if(alpha >= 1.0) {
+        fprintf(stderr, "WARNING : alpha in bxdfGTR1 is >= 1.0 !\n");
+    }
+
+    auto *bxdf = new BxdfGTR1(alpha);
+    auto *sampler = new SamplerGTR1(alpha);
+    auto *texture = new TextureSimple(color);
+    bxdfs.push_back(bxdf);
+    samplers.push_back(sampler);
+    textures.push_back(texture);
+}
+
+void SceneParser::parse_bxdf_disney() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    char filename[MAX_PARSER_TOKEN_LENGTH];
+    filename[0] = 0;
+    get_token_expect(token, "{");
+    get_token_expect(token, "color");
+    Vec3 color = read_vec3();
+    get_token_expect(token, "metallic");
+    float metallic = read_float();
+    get_token_expect(token, "subsurface");
+    float subsurface = read_float();
+    get_token_expect(token, "specular");
+    float specular = read_float();
+    get_token_expect(token, "specularTint");
+    float specularTint = read_float();
+    get_token_expect(token, "roughness");
+    float roughness = read_float();
+    get_token_expect(token, "anisotropic");
+    float anisotropic = read_float();
+    get_token_expect(token, "sheen");
+    float sheen = read_float();
+    get_token_expect(token, "sheenTint");
+    float sheenTint = read_float();
+    get_token_expect(token, "clearcoat");
+    Vec3 clearcoat = read_vec3();
+    get_token_expect(token, "clearcoatGloss");
+    float clearcoatGloss = read_float();
+    get_token_expect(token, "}");
+
+    auto *bxdf = new BxdfDisney(
+        metallic,
+        subsurface,
+        specular,
+        specularTint,
+        roughness,
+        anisotropic,
+        sheen,
+        sheenTint,
+        clearcoat,
+        clearcoatGloss
+    );
+    // auto *sampler = new SamplerLambertian();
+    // auto *sampler = new SamplerGGX(0.1, 0.1, 0.1);
+    // auto *sampler = new SamplerGTR1(0.1);
+    auto *sampler = new SamplerDisney(
+        metallic,
+        subsurface,
+        specular,
+        specularTint,
+        roughness,
+        anisotropic,
+        sheen,
+        sheenTint,
+        clearcoat,
+        clearcoatGloss
+    );
+    auto *texture = new TextureSimple(color);
+    bxdfs.push_back(bxdf);
+    samplers.push_back(sampler);
+    textures.push_back(texture);
+}
+
+void SceneParser::parse_bxdf_reflection() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    char filename[MAX_PARSER_TOKEN_LENGTH];
+    filename[0] = 0;
+    get_token_expect(token, "{");
+    get_token_expect(token, "color");
+    Vec3 color = read_vec3();
+    get_token_expect(token, "}");
+
+    auto *bxdf = new BxdfSpecular();
+    auto *sampler = new SamplerReflection();
+    auto *texture = new TextureSimple(color);
+    bxdfs.push_back(bxdf);
+    samplers.push_back(sampler);
+    textures.push_back(texture);
+}
+
+void SceneParser::parse_bxdf_refraction() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    char filename[MAX_PARSER_TOKEN_LENGTH];
+    filename[0] = 0;
+    get_token_expect(token, "{");
+    get_token_expect(token, "refract");
+    float alpha = read_float();
+    get_token_expect(token, "color");
+    Vec3 color = read_vec3();
+    get_token_expect(token, "}");
+
+    auto *bxdf = new BxdfSpecular();
+    auto *sampler = new SamplerRefraction(alpha);
+    auto *texture = new TextureSimple(color);
+    bxdfs.push_back(bxdf);
+    samplers.push_back(sampler);
+    textures.push_back(texture);
+}
+
 int SceneParser::get_num_materials() {
     return bxdfs.size();
 }
@@ -290,6 +420,8 @@ void SceneParser::parse_lights() {
             parse_directional_light();
         } else if (strcmp(token, "PointLight") == 0) {
             parse_point_light();
+        } else if (strcmp(token, "GlobalLight") == 0) {
+            parse_global_light();
         } else if (strcmp(token, "TriangularLight") == 0) {
             parse_triangle_light();
         } else {
@@ -359,6 +491,27 @@ void SceneParser::parse_triangle_light() {
     );
     group->add(info);
     group_light_triangle.push_back(group);
+}
+
+void SceneParser::parse_global_light() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    get_token_expect(token, "{");
+    get_token_expect(token, "emittor");
+    Vec3 emittor = read_vec3();
+    get_token_expect(token, "}");
+
+    LightGlobal *light_global = new LightGlobal();
+    ResourceGroupLightGlobal *group = new ResourceGroupLightGlobal;
+    TextureSimple *texture = new TextureSimple(emittor);
+    ResourceLightGlobal info(
+        light_global,
+        nullptr,
+        nullptr,
+        texture,
+        emittor
+    );
+    group->add(info);
+    group_light_global.push_back(group);
 }
 
 void SceneParser::parse_group(int current_index, Mat3 T) {
@@ -580,25 +733,25 @@ void SceneParser::parse_transform(int current_index, Mat3 T) {
     while (true) {
         if (!strcmp(token, "Scale")) {
             Vec3 s = read_vec3();
-            matrix = matrix * Mat3::mat_from_scale(s);
+            matrix = Mat3::mat_from_scale(s) * matrix;
         } else if (!strcmp(token, "UniformScale")) {
             float s = read_float();
-            matrix = matrix * Mat3::mat_from_scale(Vec3(s, s, s));
+            matrix = Mat3::mat_from_scale(Vec3(s, s, s)) * matrix;
         } else if (!strcmp(token, "Translate")) {
-            matrix = matrix * Mat3::mat_from_trans(read_vec3());
+            matrix = Mat3::mat_from_trans(read_vec3()) * matrix;
         } else if (!strcmp(token, "XRotate")) {
-            matrix = matrix * Mat3::mat_from_rotate(Vec3(1.0f, 0.0f, 0.0f), degrees_to_radians(read_float()));
+            matrix = Mat3::mat_from_rotate(Vec3(1.0f, 0.0f, 0.0f), degrees_to_radians(read_float())) * matrix;
         } else if (!strcmp(token, "YRotate")) {
-            matrix = matrix * Mat3::mat_from_rotate(Vec3(0.0f, 1.0f, 0.0f), degrees_to_radians(read_float()));
+            matrix = Mat3::mat_from_rotate(Vec3(0.0f, 1.0f, 0.0f), degrees_to_radians(read_float())) * matrix;
         } else if (!strcmp(token, "ZRotate")) {
-            matrix = matrix * Mat3::mat_from_rotate(Vec3(0.0f, 0.0f, 1.0f), degrees_to_radians(read_float()));
+            matrix = Mat3::mat_from_rotate(Vec3(0.0f, 0.0f, 1.0f), degrees_to_radians(read_float())) * matrix;
         } else if (!strcmp(token, "Rotate")) {
             get_token(token);
             assert (!strcmp(token, "{"));
             Vec3 axis = read_vec3();
             float degrees = read_float();
             float radians = degrees_to_radians(degrees);
-            matrix = matrix * Mat3::mat_from_rotate(axis, radians);
+            matrix = Mat3::mat_from_rotate(axis, radians) * matrix;
             get_token(token);
             assert (!strcmp(token, "}"));
         } else if (!strcmp(token, "Matrix4f")) {
@@ -722,6 +875,23 @@ ResourceGroupLightTriangle *SceneParser::get_group_light_triangle(int n) {
     return group_light_triangle[n];
 }
 
+
+int SceneParser::n_group_light_global() {
+    return group_light_global.size();
+}
+
+int SceneParser::tot_in_group_light_global() {
+    int n = 0;
+    for(uint i = 0; i < group_light_global.size(); ++i) {
+        n += group_light_global[i]->n_objects();
+    }
+    return n;
+}
+
+ResourceGroupLightGlobal *SceneParser::get_group_light_global(int n) {
+    return group_light_global[n];
+}
+
 // accel //////////////////////////////////////////////////////////////////////
 
 template<typename T>
@@ -775,6 +945,7 @@ Accel *SceneParser::build_accel() {
     get_n_light(accel, group_light_point);
     get_n_light(accel, group_light_direction);
     get_n_light(accel, group_light_triangle);
+    get_n_light(accel, group_light_global);
     get_n(accel, group_mesh);
     get_n(accel, group_sphere);
     get_n(accel, group_plane);
@@ -785,6 +956,7 @@ Accel *SceneParser::build_accel() {
     add_resource_light(accel, group_light_point);
     add_resource_light(accel, group_light_direction);
     add_resource_light(accel, group_light_triangle);
+    add_resource_light(accel, group_light_global);
     add_resource(accel, group_mesh);
     add_resource(accel, group_sphere);
     add_resource(accel, group_plane);

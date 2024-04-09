@@ -14,7 +14,10 @@
 #include "../camera/camera_perspective.hpp"
 #include "../camera/camera.hpp"
 
+#include "../bxdf/bxdf_specular.hpp"
+#include "../bxdf/bxdf_disney.hpp"
 #include "../bxdf/bxdf_ggx.hpp"
+#include "../bxdf/bxdf_gtr1.hpp"
 #include "../bxdf/bxdf_lambertian.hpp"
 #include "../bxdf/bxdf_phong.hpp"
 #include "../bxdf/bxdf.hpp"
@@ -31,6 +34,7 @@
 
 #include "../resource/emittor.hpp"
 #include "../resource/resource_light_direction.hpp"
+#include "../resource/resource_light_global.hpp"
 #include "../resource/resource_light_point.hpp"
 #include "../resource/resource_light_triangle.hpp"
 #include "../resource/resource_mesh.hpp"
@@ -38,7 +42,9 @@
 #include "../resource/resource_sphere.hpp"
 #include "../resource/resource.hpp"
 
+#include "../sampler/sampler_disney.hpp"
 #include "../sampler/sampler_ggx.hpp"
+#include "../sampler/sampler_gtr1.hpp"
 #include "../sampler/sampler_lambertian.hpp"
 #include "../sampler/sampler_reflection.hpp"
 #include "../sampler/sampler_refraction.hpp"
@@ -91,6 +97,10 @@ public:
     int tot_in_group_light_triangle();
     ResourceGroupLightTriangle *get_group_light_triangle(int n);
 
+    int n_group_light_global();
+    int tot_in_group_light_global();
+    ResourceGroupLightGlobal *get_group_light_global(int n);
+
     Accel *build_accel();
 
     /// @brief if the hit indicates a light
@@ -109,6 +119,7 @@ public:
     float get_pdf_random_light(const RayHit &hit);
 
 private:
+    int parse_lines;
 
     float degrees_to_radians(float);
     void parse_file();
@@ -117,11 +128,16 @@ private:
     void parse_lights();
     void parse_point_light();
     void parse_directional_light();
+    void parse_global_light();
 
     void parse_materials();
     void parse_material_phong();
     void parse_bxdf_lambertian();
     void parse_bxdf_ggx();
+    void parse_bxdf_gtr1();
+    void parse_bxdf_disney();
+    void parse_bxdf_reflection();
+    void parse_bxdf_refraction();
 
     void parse_group(int current_index, Mat3 T);
     void parse_object(int current_index, Mat3 T, char token[MAX_PARSER_TOKEN_LENGTH]);
@@ -151,6 +167,7 @@ private:
     std::vector<ResourceGroupLightPoint*> group_light_point;
     std::vector<ResourceGroupLightDirection*> group_light_direction;
     std::vector<ResourceGroupLightTriangle*> group_light_triangle;
+    std::vector<ResourceGroupLightGlobal*> group_light_global;
     std::vector<ResourceGroupSphere*> group_sphere;
     std::vector<ResourceGroupPlane*> group_plane;
     std::vector<ResourceGroupMesh*> group_mesh;

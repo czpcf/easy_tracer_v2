@@ -1,6 +1,4 @@
 #include "accel_bvh.hpp"
-#include <iostream>
-using namespace std;
 
 AccelBVH::AccelBVH() {
 }
@@ -34,7 +32,7 @@ void AccelBVH::add(ResourceGroup *group) {
 bool AccelBVH::inter(const Ray &ray, RayHit &hit) {
     hit.set(-1, 1e38, Vec2());
     bool yes = false;
-    for(int num = 0; num < have;) {
+    for(uint num = 0; num < have;) {
         uint g = rs[num];
         if(g & 1) {
             if(shapes_this[num]->inter_update(ray, hit)) {
@@ -56,7 +54,7 @@ bool AccelBVH::inter(const Ray &ray, RayHit &hit) {
 }
 
 bool AccelBVH::if_inter_dis(const Ray &ray, float dis) {
-    for(int num = 0; num < have;) {
+    for(uint num = 0; num < have;) {
         uint g = rs[num];
         if(g & 1) {
             if(shapes_this[num]->if_inter_dis(ray, dis) == true) {
@@ -81,7 +79,7 @@ bool AccelBVH::if_inter_id(const Ray &ray, int id) {
     RayHit hit;
     hit.set(-1, 1e38, Vec2());
     bool yes = false;
-    for(int num = 0; num < have;) {
+    for(uint num = 0; num < have;) {
         uint g = rs[num];
         if(g & 1) {
             if(shapes_this[num]->inter_update(ray, hit)) {
@@ -113,7 +111,7 @@ void AccelBVH::build_tree(uint l, uint r, uint &tot, RNGMT19937 &rng, uint dep) 
     float cost_x = 1e30, cost_y = 1e30, cost_z = 1e30;
     uint pos_x, pos_y, pos_z;
     Box box = aux_boxes[l].first;
-    for(int i = l + 1; i < r; ++i) {
+    for(uint i = l + 1; i < r; ++i) {
         box.add(aux_boxes[i].first);
     }
     float area = box.half_area();
@@ -155,7 +153,7 @@ void AccelBVH::build_tree(uint l, uint r, uint &tot, RNGMT19937 &rng, uint dep) 
     sort_box(cost_z, pos_z);
 
     // recursion
-    uint pos;
+    uint pos = (l + r)>>1;
     if(cost_x < cost_y && cost_x < cost_z) {
         std::sort(aux_boxes.begin() + l, aux_boxes.begin() + r, [](std::pair<Box, uint> a, std::pair<Box, uint> b){
             return a.first.mid().x < b.first.mid().x;
@@ -228,7 +226,7 @@ void AccelBVH::build_tree(uint l, uint r, uint &tot, RNGMT19937 &rng, uint dep) 
 }
 
 void AccelBVH::build() {
-    int n = shapes.size();
+    uint n = shapes.size();
     height = 0;
     while(rs.size() < 2 * n) {
         rs.push_back(0);
@@ -239,21 +237,21 @@ void AccelBVH::build() {
     while(boxes.size() < 2 * n) {
         boxes.push_back(Box());
     }
-    for(int i = 0; i < 2 * n; ++i) {
+    for(uint i = 0; i < 2 * n; ++i) {
         rs[i] = nxt[i] = 0;
     }
-    for(int i = 0; i < n; ++i) {
+    for(uint i = 0; i < n; ++i) {
         aux_boxes.push_back(std::make_pair(shapes[i] -> bound(), i));
         aux_boxes_buf.push_back(shapes[i] -> bound());
     }
-    for(int i = 0; i < n * 2; ++i) {
+    for(uint i = 0; i < n * 2; ++i) {
         shapes_this.push_back(nullptr);
     }
     uint tot = 0;
     RNGMT19937 rng(123);
     int l = 0; // for boxes with infinite areas
     int r = n; // for boxes with 0 area
-    for(int i = 0; i < n; ++i) {
+    for(int i = 0; i < int(n); ++i) {
         if(aux_boxes[i].first.area() > 1e15) {
             int id = aux_boxes[i].second;
             rs[tot] = (id<<1) | 1;
@@ -265,13 +263,12 @@ void AccelBVH::build() {
             ++l;
         }
     }
-    for(int i = n - 1; i >= 0; --i) {
+    for(int i = int(n - 1); i >= 0; --i) {
         if(aux_boxes[i].first.area() < 1e-6) {
             swap(aux_boxes[i], aux_boxes[r - 1]);
             --r;
         }
     }
-    cout<<tot<<endl;
     build_tree(l, r, tot, rng, 0);
     aux_boxes.clear();
     aux_boxes_buf.clear();

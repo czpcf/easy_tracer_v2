@@ -57,6 +57,9 @@ public:
     /// @brief world to local
     const Vec3 world_to_local(const Vec3 &w) const;
 
+    /// @brief local to world
+    const Vec3 local_to_world(const Vec3 &w) const;
+
 private:
     Vec3 normal;
     Vec3 x;

@@ -60,7 +60,9 @@ Vec3 mc(Vec3 ori, Vec3 dir, RNG *rng) {
         if(sampler->sample_in(surface, rng, -dir, dir_in, pdf) == false) {
             break;
         }
-        product_pdf *= pdf;
+        if(pdf > 0) {
+            product_pdf *= pdf;
+        }
         product_bxdf *= bxdf->phase(surface, dir_in, -dir, normal);
         Vec3 g = bxdf->phase(surface, dir_in, -dir, normal);
         product_beta *= fabs(normal.dot(dir_in));
@@ -110,7 +112,7 @@ int main(int argc, char *argv[]) {
     omp_set_num_threads(max_threads);
 
     for(int t = 0; t < samples; ++t) {
-        cout << "samples: [" << t << "/" << samples << "]\r";
+        fprintf(stderr, "samples: [%d/%d]\r", t, samples);
         #pragma omp parallel
         {
             int id = omp_get_thread_num();

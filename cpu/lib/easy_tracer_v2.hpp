@@ -8,9 +8,12 @@
 #include "accel/accel.cpp"
 #include "accel/box.hpp"
 
+#include "bxdf/bxdf_disney.hpp"
 #include "bxdf/bxdf_ggx.hpp"
+#include "bxdf/bxdf_gtr1.hpp"
 #include "bxdf/bxdf_lambertian.hpp"
 #include "bxdf/bxdf_phong.hpp"
+#include "bxdf/bxdf_specular.hpp"
 #include "bxdf/bxdf.hpp"
 
 #include "camera/camera_perspective.hpp"
@@ -26,6 +29,7 @@
 #include "image/image.hpp"
 
 #include "light/light_direction.hpp"
+#include "light/light_global.hpp"
 #include "light/light_point.hpp"
 #include "light/light_triangle.hpp"
 #include "light/light.hpp"
@@ -40,6 +44,7 @@
 
 #include "resource/emittor.hpp"
 #include "resource/resource_light_direction.hpp"
+#include "resource/resource_light_global.hpp"
 #include "resource/resource_light_point.hpp"
 #include "resource/resource_light_triangle.hpp"
 #include "resource/resource_mesh.hpp"
@@ -48,7 +53,9 @@
 #include "resource/resource.hpp"
 
 #include "sampler/onb.hpp"
+#include "sampler/sampler_disney.hpp"
 #include "sampler/sampler_ggx.hpp"
+#include "sampler/sampler_gtr1.hpp"
 #include "sampler/sampler_lambertian.hpp"
 #include "sampler/sampler_reflection.hpp"
 #include "sampler/sampler_refraction.hpp"

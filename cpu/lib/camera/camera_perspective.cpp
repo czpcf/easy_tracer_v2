@@ -8,7 +8,7 @@ CameraPerspective::CameraPerspective(const Vec3 &eye, const Vec3 &direction, con
     // make sure the vectors are normalized
     cx = float(width) / 2.0f;
     cy = float(height) / 2.0f;
-    fx = std::tan(angle / 2.0f) / cx;
+    fx = std::tan(angle / 2.0f) / cx * cx / cy;
     fy = std::tan(angle / 2.0f) / cy;
 }
 

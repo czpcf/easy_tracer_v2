@@ -34,7 +34,7 @@ bool SamplerRefraction::sample_in(const Surface &surface, RNG *rng, const Vec3 &
 }
 
 float SamplerRefraction::pdf(const Surface &surface, const Vec3 &, const Vec3 &) {
-    return 0.0f;
+    return -1.0f;
 }
 
 bool SamplerRefraction::is_specular() {

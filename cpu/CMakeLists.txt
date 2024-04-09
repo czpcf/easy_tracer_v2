@@ -12,9 +12,12 @@ set(SOURCE_FILES
     lib/accel/accel_naive.cpp
     lib/accel/accel.cpp
     lib/accel/box.cpp
+    lib/bxdf/bxdf_disney.cpp
     lib/bxdf/bxdf_ggx.cpp
+    lib/bxdf/bxdf_gtr1.cpp
     lib/bxdf/bxdf_lambertian.cpp
     lib/bxdf/bxdf_phong.cpp
+    lib/bxdf/bxdf_specular.cpp
     lib/bxdf/bxdf.cpp
     lib/camera/camera_perspective.cpp
     lib/camera/camera.cpp
@@ -28,6 +31,7 @@ set(SOURCE_FILES
     lib/light/light_direction.cpp
     lib/light/light_point.cpp
     lib/light/light_triangle.cpp
+    lib/light/light_global.cpp
     lib/light/light.cpp
     lib/parser/parser_scene.cpp
     lib/random/random_mt19937.cpp
@@ -36,6 +40,7 @@ set(SOURCE_FILES
     lib/ray/ray.cpp
     lib/resource/emittor.cpp
     lib/resource/resource_light_direction.cpp
+    lib/resource/resource_light_global.cpp
     lib/resource/resource_light_point.cpp
     lib/resource/resource_light_triangle.cpp
     lib/resource/resource_mesh.cpp
@@ -44,7 +49,9 @@ set(SOURCE_FILES
     lib/resource/resource.cpp
     lib/resource/surface.cpp
     lib/sampler/onb
+    lib/sampler/sampler_disney.cpp
     lib/sampler/sampler_ggx.cpp
+    lib/sampler/sampler_gtr1.cpp
     lib/sampler/sampler_lambertian.cpp
     lib/sampler/sampler_reflection.cpp
     lib/sampler/sampler_refraction.cpp

@@ -1,7 +1,5 @@
 #include "sampler_ggx.hpp"
-#include<assert.h>
-#include<iostream>
-using namespace std;
+
 static float clamp(float z, float min, float max) {
     return fmax(min, fmin(max, z));
 }

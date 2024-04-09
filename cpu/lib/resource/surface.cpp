@@ -57,3 +57,10 @@ const Vec3 Surface::world_to_local(const Vec3 &w) const {
     float dot_y = projected.dot(y);
     return Vec3(dot_x, dot_y, normal.dot(w)).norm();
 }
+
+const Vec3 Surface::local_to_world(const Vec3 &w) const {
+    return 
+        normal * w.z +
+        x * w.x +
+        y * w.y;
+}

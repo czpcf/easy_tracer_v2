@@ -15,8 +15,8 @@ using namespace std;
 SceneParser parser;
 Accel *accel;
 
-const uint max_depth = 4;
-const uint samples = 32;
+const uint max_depth = 5;
+const uint samples = 1024;
 
 static Vec3 offset(const Vec3 &p, const Vec3 &d) {
     return p + d * 0.00006103515625f;
@@ -99,61 +99,63 @@ Vec3 mc(Vec3 ori, Vec3 dir, RNG *rng) {
             bxdf = surface.get_bxdf();
             sampler = surface.get_sampler();
         }
-        // sampling method 2: sample light
-        ResourceLight *resource_light;
-        float pdf_choose_light;
-        parser.get_random_light(rng, resource_light, pdf_choose_light);
-        auto light = resource_light->get_light();
+        if(!sampler->is_specular()) {
+            // sampling method 2: sample light
+            ResourceLight *resource_light;
+            float pdf_choose_light;
+            parser.get_random_light(rng, resource_light, pdf_choose_light);
+            auto light = resource_light->get_light();
 
-        Ray light_to_suf;
-        float pdf_sample_in_ray;
-        Vec2 local_light;
+            Ray light_to_suf;
+            float pdf_sample_in_ray;
+            Vec2 local_light;
 
-        // if successfully sample a ray...
-        if(light->sample_in_ray(rng, inter, light_to_suf, pdf_sample_in_ray, local_light)) {
-            /// TODO: may be better?
-            // nothing between light and intersection
+            // if successfully sampled a ray...
+            if(light->sample_in_ray(rng, inter, light_to_suf, pdf_sample_in_ray, local_light)) {
+                /// TODO: may be better?
+                // nothing between light and intersection
 
-            if(accel->if_inter_dis(offset(light_to_suf), (light_to_suf.get_origin() - inter).len() * 0.9999f) == false) {
-                // cosine on surface
-                float cos_suf = fabs(light_to_suf.get_direction().dot(-normal_suf));
+                if(accel->if_inter_dis(offset(light_to_suf), (light_to_suf.get_origin() - inter).len() * 0.9999f) == false) {
+                    // cosine on surface
+                    float cos_suf = fabs(light_to_suf.get_direction().dot(-normal_suf));
 
-                // NO cosine on light !
-                // because light may be point/directional;
-                if(cos_suf > 1e-4) {
-                    Vec3 emittor = resource_light->get_emittor();
+                    // NO cosine on light !
+                    // because light may be point/directional;
+                    if(cos_suf > 1e-4) {
+                        Vec3 emittor = resource_light->get_emittor();
 
-                    // if the light is specular
-                    if(light->is_specular()) {
-                        Vec3 now_bxdf = bxdf->phase(surface, -light_to_suf.get_direction(), -dir, normal_suf);
+                        // if the light is specular
+                        if(light->is_specular()) {
+                            Vec3 now_bxdf = bxdf->phase(surface, -light_to_suf.get_direction(), -dir, normal_suf);
 
-                        radiance += emittor * product_bxdf * product_beta * now_bxdf *
-                            cos_suf * // dont forget about the cosine term !
-                            (1.0 / fmax(product_pdf * pdf_choose_light, 1e-6));
-                    } else {
-                        // pdf of samling on light
-                        float pdf_light =
-                            pdf_choose_light * // choose THIS light
-                            pdf_sample_in_ray; // sample THIS ray
+                            radiance += emittor * product_bxdf * product_beta * now_bxdf *
+                                cos_suf * // dont forget about the cosine term !
+                                (1.0 / fmax(product_pdf * pdf_choose_light, 1e-6));
+                        } else {
+                            // pdf of samling on light
+                            float pdf_light =
+                                pdf_choose_light * // choose THIS light
+                                pdf_sample_in_ray; // sample THIS ray
 
-                        float cos_light = fabs(
-                            resource_light->get_surface(local_light).get_normal()
-                            .dot(light_to_suf.get_direction()));
-                        
-                        float pdf_bxdf =
-                            sampler->pdf(surface, -dir, -light_to_suf.get_direction()) * // sampling bxdf pdf
-                            cos_light * // jacobian
-                            light->decaying(inter, ori); // decaying of light
-                        
-                        float mis_weight = heuristic(pdf_light, pdf_bxdf);
+                            float cos_light = fabs(
+                                resource_light->get_surface(local_light).get_normal()
+                                .dot(light_to_suf.get_direction()));
+                            
+                            float pdf_bxdf =
+                                sampler->pdf(surface, -dir, -light_to_suf.get_direction()) * // sampling bxdf pdf
+                                cos_light * // jacobian
+                                light->decaying(inter, ori); // decaying of light
+                            
+                            float mis_weight = heuristic(pdf_light, pdf_bxdf);
 
-                        // geometry term
-                        float G = cos_suf * cos_light / (inter - light_to_suf.get_origin()).square();
+                            // geometry term
+                            float G = cos_suf * cos_light / (inter - light_to_suf.get_origin()).square();
 
-                        Vec3 now_bxdf = bxdf->phase(surface, -light_to_suf.get_direction(), -dir, normal_suf);
+                            Vec3 now_bxdf = bxdf->phase(surface, -light_to_suf.get_direction(), -dir, normal_suf);
 
-                        radiance += emittor * product_bxdf * product_beta * now_bxdf *
-                            (G * mis_weight / fmax(product_pdf * pdf_light, 1e-6));
+                            radiance += emittor * product_bxdf * product_beta * now_bxdf *
+                                (G * mis_weight / fmax(product_pdf * pdf_light, 1e-6));
+                        }
                     }
                 }
             }
@@ -163,7 +165,11 @@ Vec3 mc(Vec3 ori, Vec3 dir, RNG *rng) {
         if(sampler->sample_in(surface, rng, -dir, dir_in, pdf_last_sampler) == false) {
             break;
         }
-        product_pdf *= pdf_last_sampler;
+        if(pdf_last_sampler > 0) {
+            product_pdf *= pdf_last_sampler;
+        } else {
+            pdf_last_sampler = 1e30;
+        }
         product_bxdf *= bxdf->phase(surface, dir_in, -dir, normal_suf);
         Vec3 g = bxdf->phase(surface, dir_in, -dir, normal_suf);
         product_beta *= fabs(normal_suf.dot(dir_in));
@@ -219,20 +225,15 @@ int main(int argc, char *argv[]) {
     }
 
     for(int t = 0; t < samples; ++t) {
-        cout << "samples: [" << t << "/" << samples << "]\r";
+        fprintf(stderr, "samples: [%d/%d]\r", t, samples);
         #pragma omp parallel
         {
             int id = omp_get_thread_num();
             for(int x = id; x < width; x += max_threads) {
                 for(int y = 0; y < height; ++y) {
-                    // cout<<"DEBUG "<<endl;
-                    // x=800;
-                    // y=20;;
                     Ray camRay = camera->generate_ray(Vec2(rng[id].rand_float() + x, rng[id].rand_float() + y));
                     Vec3 res = mc(camRay.get_origin(), camRay.get_direction(), &rng[id]);
                     image.add_pixel(x, y, res);
-                    // cout<<res.x<<" "<<res.y<<" "<<res.z<<endl;
-                    // exit(0);
                 }
             }
         }

@@ -1,6 +1,10 @@
 #include "resource_mesh.hpp"
 #include "tiny_obj_loader.h"
 
+
+#include<iostream>
+using namespace std;
+
 ResourceTriangle::ResourceTriangle() {
 }
 
@@ -219,7 +223,7 @@ ResourceGroupMesh::ResourceGroupMesh(
             Vec3 n2;
             Vec2 u2;
             if(have_normals) {
-                assert(0 <= i.normal_index && i.normal_index < vertices.size());
+                // assert(0 <= i.normal_index && i.normal_index < vertices.size());
                 n2 = normals[i.normal_index];
             }
             if(have_uvs) {
