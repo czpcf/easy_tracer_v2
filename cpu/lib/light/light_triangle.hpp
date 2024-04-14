@@ -14,13 +14,17 @@ public:
     LightTriangle(const Triangle &t);
     ~LightTriangle() override = default;
 
+    /// @brief sample point on the light and set pdf
+    /// if pdf < 0, its delta distribution
+    void sample_point(RNG *rng, Vec3 &p_on_light, float &pdf, Vec2 &local) override;
+
     /// @brief sample point on the light given the point on the surface, and set pdf
     /// if pdf < 0, its delta distribution
     void sample_point(RNG *rng, const Vec3 &p_on_suf, Vec3 &p_on_light, float &pdf, Vec2 &local) override;
 
     /// @brief sample direction and set pdf
     /// if pdf < 0, its delta distribution
-    void sample_direction(RNG *rng, const Vec3 &p_on_suf, Vec3 &dir, float &pdf) override;
+    void sample_direction(RNG *rng, const Vec3 &p_on_light, Vec3 &dir, float &pdf) override;
 
     /// @brief sample ray on the light and set pdf
     /// if pdf < 0, its delta distribution
@@ -44,11 +48,14 @@ public:
     /// @brief return shape
     Geometry *get_shape() override;
 
-    /// @brief is this light specular(cannot sample on its manifold) ?
-    bool is_specular() override;
-
     /// @brief decaying of light
     float decaying(const Vec3 &p_on_suf, const Vec3 &p_on_light) override;
+
+    /// @brief return area type
+    const AreaType area_type() const override;
+
+    /// @brief return direction type
+    const DirType dir_type() const override;
 
     const Vec3 get_norm() const;
 

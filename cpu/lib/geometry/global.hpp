@@ -1,18 +1,17 @@
 /*
-point
-only suitable for point light
+global
+only suitable for global light
 */
 
-#ifndef POINT_H
-#define POINT_H
+#ifndef GLOBAL_H
+#define GLOBAL_H
 
 #include "geometry.hpp"
 
-class Point: public Geometry {
+class Global: public Geometry {
 public:
-    Point();
-    Point(const Vec3 &);
-    ~Point() override = default;
+    Global();
+    ~Global() override = default;
 
     /// @brief intersection with the line from point p in direction d
     /// if intersected, return true and set ray-hit
@@ -47,7 +46,6 @@ public:
     const Vec3 get_o() const;
 
 protected:
-    Vec3 o;
 };
 
 #endif

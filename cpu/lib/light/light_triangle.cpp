@@ -7,6 +7,22 @@ LightTriangle::LightTriangle() {
 
 LightTriangle::LightTriangle(const Triangle &t): triangle(t) {}
 
+void LightTriangle::sample_point(RNG *rng, Vec3 &p_on_light, float &pdf, Vec2 &local) {
+    float ux_light = rng->rand_float();
+    float uy_light = rng->rand_float();
+    Vec3 p1 = triangle.get_p1();
+    Vec3 p2 = triangle.get_p2();
+    Vec3 p3 = triangle.get_p3();
+    p_on_light = p1; // mean sampling on a triangle, be careful!
+    if(ux_light + uy_light > 1.0f) { // flip it into the triangle
+        p_on_light += (p2 - p1) * (1.0f - ux_light) + (p3 - p1) * (1.0f - uy_light);
+    } else {
+        p_on_light += (p2 - p1) * ux_light + (p3 - p1) * uy_light;
+    }
+    pdf = 1.0f / triangle.area();
+    local = get_shape()->inter_to_local(p_on_light);
+}
+
 void LightTriangle::sample_point(RNG *rng, const Vec3 &p_on_suf, Vec3 &p_on_light, float &pdf, Vec2 &local) {
     float ux_light = rng->rand_float();
     float uy_light = rng->rand_float();
@@ -81,8 +97,12 @@ Geometry *LightTriangle::get_shape() {
     return &triangle;
 }
 
-bool LightTriangle::is_specular() {
-    return false;
+const AreaType LightTriangle::area_type() const {
+    return AreaType::FINITE;
+}
+
+const DirType LightTriangle::dir_type() const {
+    return DirType::CONTINOUS;
 }
 
 float LightTriangle::decaying(const Vec3 &p_on_suf, const Vec3 &p_on_light) {

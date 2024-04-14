@@ -6,6 +6,12 @@ LightDirection::LightDirection() {
 
 LightDirection::LightDirection(const Direction &d): d(d) {}
 
+void LightDirection::sample_point(RNG *rng, Vec3 &p_on_light, float &pdf, Vec2 &local) {
+    // do nothing
+    pdf = -1.0f;
+    local = Vec2(0.0f, 0.0f);
+}
+
 void LightDirection::sample_point(RNG *rng, const Vec3 &p_on_suf, Vec3 &p_on_light, float &pdf, Vec2 &local) {
     // do nothing
     pdf = -1.0f;
@@ -43,8 +49,12 @@ Geometry *LightDirection::get_shape() {
     return &d;
 }
 
-bool LightDirection::is_specular() {
-    return true;
+const AreaType LightDirection::area_type() const {
+    return AreaType::INFINITE;
+}
+
+const DirType LightDirection::dir_type() const {
+    return DirType::SINGULAR;
 }
 
 float LightDirection::decaying(const Vec3 &p_on_suf, const Vec3 &p_on_light) {

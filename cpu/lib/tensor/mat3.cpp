@@ -1,4 +1,5 @@
 #include <cmath>
+#include <iostream>
 #include "mat3.hpp"
 
 Mat3::Mat3() {
@@ -165,4 +166,29 @@ Mat3 Mat3::look_at(const Vec3 &eye, const Vec3 &center, const Vec3 &up) {
     T.b[1] = eye.y;
     T.b[2] = eye.z;
     return T;
+}
+
+
+Mat3 Mat3::look_at_inv(const Vec3 &eye, const Vec3 &center, const Vec3 &up) {
+    Vec3 z = (center - eye).norm();
+    Vec3 y = up;
+    Vec3 x = y.cross(z);
+	// the x, y, and z vectors define the orthonormal coordinate system
+	// the affine part defines the overall translation
+    Mat3 T;
+    // transpose
+    T.a[0] = x.x; T.a[3] = y.x; T.a[6] = z.x;
+    T.a[1] = x.y; T.a[4] = y.y; T.a[7] = z.y;
+    T.a[2] = x.z; T.a[5] = y.z; T.a[8] = z.z;
+    T.b[0] = -eye.x;
+    T.b[1] = -eye.y;
+    T.b[2] = -eye.z;
+    return T;
+}
+
+void Mat3::debug() {
+    fprintf(stderr, "Mat3\n");
+    fprintf(stderr, "%f %f %f %f\n", a[0], a[1], a[2], b[0]);
+    fprintf(stderr, "%f %f %f %f\n", a[3], a[4], a[5], b[1]);
+    fprintf(stderr, "%f %f %f %f\n", a[6], a[7], a[8], b[2]);
 }

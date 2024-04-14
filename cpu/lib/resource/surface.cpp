@@ -2,6 +2,7 @@
 #include "../bxdf/bxdf.hpp"
 
 Surface::Surface() {
+    empty = true;
 }
 
 
@@ -13,6 +14,7 @@ Surface::Surface(
     Bxdf *b,
     Sampler *s):
     normal(_normal), x(_x), y(_y), color(_color), bxdf(b), sampler(s) {
+    empty = false;
 }
 
 Bxdf *Surface::get_bxdf() {
@@ -63,4 +65,8 @@ const Vec3 Surface::local_to_world(const Vec3 &w) const {
         normal * w.z +
         x * w.x +
         y * w.y;
+}
+
+const bool Surface::is_empty() const {
+    return empty;
 }

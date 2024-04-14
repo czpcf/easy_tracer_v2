@@ -2,7 +2,13 @@
 #include "light_global.hpp"
 
 LightGlobal::LightGlobal() {
-    p = Point(Vec3(0.0f, 0.0f, 0.0f));
+    p = Global();
+}
+
+void LightGlobal::sample_point(RNG *rng, Vec3 &p_on_light, float &pdf, Vec2 &local) {
+    // do nothing
+    pdf = -1.0f;
+    local = Vec2(0.0f, 0.0f);
 }
 
 void LightGlobal::sample_point(RNG *rng, const Vec3 &p_on_suf, Vec3 &p_on_light, float &pdf, Vec2 &local) {
@@ -53,8 +59,12 @@ Geometry *LightGlobal::get_shape() {
     return &p;
 }
 
-bool LightGlobal::is_specular() {
-    return true;
+const AreaType LightGlobal::area_type() const {
+    return AreaType::INFINITE;
+}
+
+const DirType LightGlobal::dir_type() const {
+    return DirType::CONTINOUS;
 }
 
 float LightGlobal::decaying(const Vec3 &p_on_suf, const Vec3 &p_on_light) {

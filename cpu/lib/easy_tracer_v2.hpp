@@ -21,6 +21,7 @@
 
 #include "geometry/direction.hpp"
 #include "geometry/geometry.hpp"
+#include "geometry/global.hpp"
 #include "geometry/plane.hpp"
 #include "geometry/point.hpp"
 #include "geometry/sphere.hpp"
@@ -68,5 +69,7 @@
 
 #include "texture/texture_simple.hpp"
 #include "texture/texture.hpp"
+
+#include "utils.hpp"
 
 #endif

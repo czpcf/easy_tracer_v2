@@ -13,36 +13,17 @@ Background {
 }
 
 Materials {
-    numMaterials 4
-    bxdfLambertian {
-        0.725 0.710 0.680
-    }
-    bxdfDisney {
-        color 0.9 0.8 0.6
-        metallic 0.4
-        subsurface 0.5
-        specular 0.2
-        specularTint 0.1
-        roughness 0.2
-        anisotropic 0.1
-        sheen 0.1
-        sheenTint 0.2
-        clearcoat 0.8 0.3 0.1
-        clearcoatGloss 0.7
-    }
-    bxdfReflection {
-        color 1.0 1.0 1.0
-    }
-    bxdfRefraction {
-        refract 2.0
-        color 1.0 1.0 1.0
+    numMaterials 1
+    bxdfGTR1 {
+        alpha 0.5
+        color 0.6 0.6 0.6
     }
 }
 
 Lights {
     numLights 1
     GlobalLight {
-        emittor 1.0 1.0 1.0
+        emittor 0.5 0.5 0.5
     }
 }
 
@@ -52,7 +33,7 @@ Group {
 	    Scale 7 7 7
 	    Translate 0.1 -0.17 0.0
         TriangleMesh {
-            faceMaterial default 1
+            faceMaterial default 0
             obj_file obj/bunny.obj
         }
     }

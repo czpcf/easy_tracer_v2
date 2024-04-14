@@ -21,7 +21,7 @@ UV ResourceLightGlobal::local_to_uv(const Vec2 &) {
 }
 
 Surface ResourceLightGlobal::get_surface(const Vec2 &local) {
-    fprintf(stderr, "cannot get surface info of global point !\n");
+    fprintf(stderr, "cannot get surface info of global light !\n");
     assert(0);
     return Surface();
 }

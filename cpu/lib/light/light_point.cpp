@@ -6,6 +6,12 @@ LightPoint::LightPoint() {
 
 LightPoint::LightPoint(const Point &p): o(p) {}
 
+void LightPoint::sample_point(RNG *rng,  Vec3 &p_on_light, float &pdf, Vec2 &local) {
+    p_on_light = o.get_o();
+    pdf = -1.0f;
+    local = Vec2(0.0f, 0.0f);
+}
+
 void LightPoint::sample_point(RNG *rng, const Vec3 &p_on_suf, Vec3 &p_on_light, float &pdf, Vec2 &local) {
     p_on_light = o.get_o();
     pdf = -1.0f;
@@ -66,8 +72,12 @@ Geometry *LightPoint::get_shape() {
     return &o;
 }
 
-bool LightPoint::is_specular() {
-    return true;
+const AreaType LightPoint::area_type() const {
+    return AreaType::ZERO;
+}
+
+const DirType LightPoint::dir_type() const {
+    return DirType::CONTINOUS;
 }
 
 float LightPoint::decaying(const Vec3 &p_on_suf, const Vec3 &p_on_light) {

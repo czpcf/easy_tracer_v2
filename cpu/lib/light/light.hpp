@@ -11,11 +11,16 @@ support sampling method and geometry
 #include "../random/random.hpp"
 #include "../ray/ray.hpp"
 #include "../geometry/geometry.hpp"
+#include "../utils.hpp"
 
 class Light {
 public:
     Light();
     virtual ~Light() = default;
+
+    /// @brief sample point on the light and set pdf,
+    /// if pdf < 0, its delta distribution
+    virtual void sample_point(RNG *rng, Vec3 &p_on_light, float &pdf, Vec2 &local) = 0;
 
     /// @brief sample point on the light given the intersection on the shape, and set pdf,
     /// if pdf < 0, its delta distribution
@@ -23,7 +28,7 @@ public:
 
     /// @brief sample direction and set pdf,
     /// if pdf < 0, its delta distribution
-    virtual void sample_direction(RNG *rng, const Vec3 &p_on_suf, Vec3 &dir, float &pdf) = 0;
+    virtual void sample_direction(RNG *rng, const Vec3 &p_on_light, Vec3 &dir, float &pdf) = 0;
 
     /// @brief sample ray on the light and set pdf,
     /// if pdf < 0, its delta distribution
@@ -48,11 +53,14 @@ public:
     /// @brief return shape of the light
     virtual Geometry *get_shape() = 0;
 
-    /// @brief is this light specular(cannot sample on its manifold) ?
-    virtual bool is_specular() = 0;
-
     /// @brief decaying of light
     virtual float decaying(const Vec3 &p_on_suf, const Vec3 &p_on_light) = 0;
+
+    /// @brief return area type
+    const virtual AreaType area_type() const = 0;
+
+    /// @brief return direction type
+    const virtual DirType dir_type() const = 0;
 };
 
 #endif

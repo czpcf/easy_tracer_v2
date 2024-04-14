@@ -60,6 +60,11 @@ public:
     /// @brief return the look-at matrix
     static Mat3 look_at(const Vec3 &eye, const Vec3 &center, const Vec3 &up);
 
+    /// @brief return the inversion of look-at matrix
+    static Mat3 look_at_inv(const Vec3 &eye, const Vec3 &center, const Vec3 &up);
+
+    void debug();
+
 private:
     /// the vector b
     float b[3];

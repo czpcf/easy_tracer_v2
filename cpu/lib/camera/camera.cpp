@@ -12,7 +12,6 @@ Camera::Camera(const Vec3 &eye, const Vec3 &direction, const Vec3 &up, int w, in
     this->up = this->horizontal.cross(this->direction);
     this->up.normalize();
     
-    this->up = up;
     this->width = w;
     this->height = h;
 }

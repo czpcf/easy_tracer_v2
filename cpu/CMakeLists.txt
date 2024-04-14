@@ -23,6 +23,7 @@ set(SOURCE_FILES
     lib/camera/camera.cpp
     lib/geometry/direction.cpp
     lib/geometry/geometry.cpp
+    lib/geometry/global.cpp
     lib/geometry/plane.cpp
     lib/geometry/point.cpp
     lib/geometry/sphere.cpp
@@ -83,6 +84,9 @@ target_link_libraries(test_rand PRIVATE easy_tracer_v2_lib)
 add_executable(test_vector test/test_vector.cpp)
 target_link_libraries(test_vector PRIVATE easy_tracer_v2_lib)
 
+add_executable(test_camera test/test_camera.cpp)
+target_link_libraries(test_camera PRIVATE easy_tracer_v2_lib)
+
 
 # shaders
 add_executable(shader_phong shader/shader_phong.cpp)
@@ -91,5 +95,11 @@ target_link_libraries(shader_phong PRIVATE easy_tracer_v2_lib)
 add_executable(shader_naive shader/shader_naive.cpp)
 target_link_libraries(shader_naive PRIVATE easy_tracer_v2_lib)
 
+add_executable(shader_nee shader/shader_nee.cpp)
+target_link_libraries(shader_nee PRIVATE easy_tracer_v2_lib)
+
 add_executable(shader_forward_mis shader/shader_forward_mis.cpp)
 target_link_libraries(shader_forward_mis PRIVATE easy_tracer_v2_lib)
+
+add_executable(shader_bpt_mis shader/shader_bpt_mis.cpp)
+target_link_libraries(shader_bpt_mis PRIVATE easy_tracer_v2_lib)

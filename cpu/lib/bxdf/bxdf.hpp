@@ -60,6 +60,9 @@ public:
     /// @brief local to world
     const Vec3 local_to_world(const Vec3 &w) const;
 
+    /// @brief if this surface is empty
+    const bool is_empty() const;
+
 private:
     Vec3 normal;
     Vec3 x;
@@ -67,6 +70,7 @@ private:
     Vec3 color;
     Bxdf *bxdf;
     Sampler *sampler;
+    bool empty;
 };
 
 #endif

@@ -1,0 +1,49 @@
+
+PerspectiveCamera {
+    center -0.01 0.995 5.0
+    direction 0 0 -1
+    up 0 1 0
+    angle 27.28
+    width 1024
+    height 1024
+}
+
+Background {
+    color 0 0 0 
+}
+
+Materials {
+    numMaterials 4
+    bxdfLambertian { 0.725 0.710 0.680 }
+    bxdfLambertian { 0.140 0.450 0.091 }
+    bxdfLambertian { 0.630 0.065 0.050 }
+    bxdfLambertian { 1.000 1.000 1.000 }
+}
+
+Lights {
+    numLights 2
+    TriangularLight {
+        MaterialIndex 3
+        emittor 17.0 12.0 4.0
+        p0 -0.24 1.98 0.16
+        p1 0.23 1.98 -0.22
+        p2 -0.24 1.98 -0.22
+    }
+    TriangularLight {
+        MaterialIndex 3
+        emittor 17.0 12.0 4.0
+        p0 -0.24 1.98 0.16
+        p1 0.23 1.98 0.16
+        p2 0.23 1.98 -0.22
+    }
+}
+
+Group {
+    numObjects 1
+    TriangleMesh {
+        faceMaterial default 0
+        faceMaterial f 3 1
+        faceMaterial f 4 2
+        obj_file obj/cornellbox_without_light.obj
+    }
+}
