@@ -55,6 +55,7 @@ Group {
 	    Scale 7 7 7
 	    Translate 0.1 -0.17 0.0
         TriangleMesh {
+            smooth
             faceMaterial default 4
             obj_file obj/bunny.obj
         }

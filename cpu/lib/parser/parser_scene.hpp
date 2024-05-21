@@ -22,6 +22,7 @@
 #include "../bxdf/bxdf_phong.hpp"
 #include "../bxdf/bxdf.hpp"
 
+#include "../geometry/curve.hpp"
 #include "../geometry/direction.hpp"
 #include "../geometry/geometry.hpp"
 #include "../geometry/plane.hpp"
@@ -147,6 +148,8 @@ private:
     void parse_triangle_mesh(int current_index, Mat3 T);
     void parse_triangle_light();
     void parse_transform(int current_index, Mat3 T);
+    void parse_bezier_curve(int current_index, Mat3 T);
+    void parse_bspline_curve(int current_index, Mat3 T);
 
     int get_num_materials();
 

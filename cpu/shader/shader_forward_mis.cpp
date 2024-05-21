@@ -15,8 +15,8 @@ using namespace std;
 SceneParser parser;
 Accel *accel;
 
-const uint max_depth = 10;
-const uint samples = 16;
+const uint max_depth = 5;
+const uint samples = 64;
 
 static Vec3 offset(const Vec3 &p, const Vec3 &d) {
     return p + d * 0.00006103515625f;
@@ -128,9 +128,10 @@ Vec3 mc(Vec3 ori, Vec3 dir, RNG *rng) {
                 /// TODO: may be better?
                 // nothing between light and intersection
 
-                if(accel->if_inter_dis(offset(light_to_suf), (light_to_suf.get_origin() - inter).len() * 0.9999f) == false) {
+                
+                if(accel->if_inter_dis(offset(light_to_suf), (light_to_suf.get_origin() - inter).len() * 0.999f) == false) {
                     // cosine on surface
-                    float cos_suf = fabs(light_to_suf.get_direction().dot(-normal_suf));
+                    float cos_suf = fabs(light_to_suf.get_direction().dot(-surface.get_inter_normal()));
 
                     // NO cosine on light !
                     // because light may be point/directional;
@@ -186,8 +187,8 @@ Vec3 mc(Vec3 ori, Vec3 dir, RNG *rng) {
             product_pdf *= -pdf_last_sampler;
             pdf_last_sampler = 1e30; // convert to infinite continous pdf
         }
-        product_bxdf *= bxdf->phase(surface, dir_in, -dir, normal_suf);
-        product_beta *= fabs(normal_suf.dot(dir_in));
+        product_bxdf *= bxdf->phase(surface, dir_in, -dir, surface.get_inter_normal());
+        product_beta *= fabs(surface.get_inter_normal().dot(dir_in));
 
         ori = inter;
         dir = dir_in;

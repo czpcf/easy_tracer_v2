@@ -3,6 +3,7 @@
 
 #include "resource.hpp"
 #include "../geometry/triangle.hpp"
+#include "../geometry/curve.hpp"
 #include "../texture/texture.hpp"
 #include <map>
 
@@ -38,15 +39,34 @@ private:
 class ResourceGroupMesh: public ResourceGroup {
 public:
     ResourceGroupMesh();
-    /// @brief mesh from obj
-    ResourceGroupMesh(const char *filename, Sampler *sampler, Bxdf *bxdf, Texture *texture);
+    /// @brief mesh from obj file
+    ResourceGroupMesh(
+        const char *filename, 
+        Sampler *sampler, 
+        Bxdf *bxdf, 
+        Texture *texture
+    );
+
+    /// @brief mesh from curve
+    /// steps: rotation steps
+    /// resolution: resolution of curve
+    ResourceGroupMesh(
+        const int steps,
+        const int resolution,
+        const Curve &curve, 
+        Sampler *sampler, 
+        Bxdf *bxdf,
+        Texture *texture
+    );
+
     ResourceGroupMesh(
         const char *filename,
         std::map<int, bool> have,
         std::map<int, int> index_map,
         std::map<int, Sampler *>sampler_map,
         std::map<int, Bxdf *>bxdf_map,
-        std::map<int, Texture *>texture_map
+        std::map<int, Texture *>texture_map,
+        bool smooth = false
     );
     ~ResourceGroupMesh() override = default;
     

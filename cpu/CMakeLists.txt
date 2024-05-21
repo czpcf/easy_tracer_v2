@@ -21,6 +21,7 @@ set(SOURCE_FILES
     lib/bxdf/bxdf.cpp
     lib/camera/camera_perspective.cpp
     lib/camera/camera.cpp
+    lib/geometry/curve.cpp
     lib/geometry/direction.cpp
     lib/geometry/geometry.cpp
     lib/geometry/global.cpp

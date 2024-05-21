@@ -55,6 +55,9 @@ public:
     /// @brief return p3
     const Vec3 get_p3() const;
 
+    /// @brief return interpolated norm according to local
+    static const Vec3 interpolate_norm(const Vec3 &n1, const Vec3 &n2, const Vec3 &n3, const Vec2 &local);
+
 private:
     /// @brief fast pre-calculation
     unsigned short type;

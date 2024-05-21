@@ -558,6 +558,10 @@ void SceneParser::parse_object(int current_index, Mat3 T, char token[MAX_PARSER_
         parse_triangle(current_index, T);
     } else if (!strcmp(token, "TriangleMesh")) {
         parse_triangle_mesh(current_index, T);
+    } else if (!strcmp(token, "BezierCurve")) {
+        parse_bezier_curve(current_index, T);
+    } else if (!strcmp(token, "BsplineCurve")) {
+        parse_bspline_curve(current_index, T);
     } else if (!strcmp(token, "Transform")) {
         parse_transform(current_index, T);
     } else {
@@ -678,6 +682,7 @@ void SceneParser::parse_triangle_mesh(int current_index, Mat3 T) {
     bxdf_map[-1] = bxdfs[index_defualt];
     sampler_map[-1] = samplers[index_defualt];
     texture_map[-1] = textures[index_defualt];
+    bool smooth = false;
     while(true) {
         get_token(token);
         if(!strcmp(token, "faceMaterial")) {
@@ -699,7 +704,9 @@ void SceneParser::parse_triangle_mesh(int current_index, Mat3 T) {
                 fprintf(stderr, "bad token found in parse_triangle_mesh !\n");
                 assert(0);
             }
-        } else {
+        } else if(!strcmp(token, "smooth")) {
+            smooth = true;
+        }else {
             break;
         }
     }
@@ -715,7 +722,8 @@ void SceneParser::parse_triangle_mesh(int current_index, Mat3 T) {
         index_map,
         sampler_map,
         bxdf_map,
-        texture_map
+        texture_map,
+        smooth
     );
     group->trans(T);
     group_mesh.push_back(group);
@@ -769,6 +777,120 @@ void SceneParser::parse_transform(int current_index, Mat3 T) {
     get_token_expect(token, "}");
 }
 
+
+void SceneParser::parse_bezier_curve(int current_index, Mat3 T) {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    get_token_expect(token, "{");
+    std::vector<Vec3> controls;
+    int index = current_index;
+    int steps = 40;
+    int resolution = 30;
+
+    while (true) {
+        get_token(token);
+        if (!strcmp(token, "controls")) {
+            get_token_expect(token, "{");
+            while(true) {
+                get_token(token);
+                if (!strcmp(token, "[")) {
+                    controls.push_back(read_vec3());
+                    get_token_expect(token, "]");
+                } else if(!strcmp(token, "}")) {
+                    break;
+                } else {
+                    fprintf(stderr, "Incorrect format for BezierCurve!\n");
+                    exit(0);
+                }
+            }
+        } else if (!strcmp(token, "}")) {
+            break;
+        } else if (!strcmp(token, "MaterialIndex")) {
+            index = read_int();
+        } else if (!strcmp(token, "Steps")) {
+            steps = read_int();
+        } else if (!strcmp(token, "Resolution")) {
+            resolution = read_int();
+        } else {
+            fprintf(stderr, "Incorrect format for BezierCurve!\n");
+            exit(0);
+        }
+    }
+    if(index < 0) {
+        fprintf(stderr, "No material found for BezierCurve!\n");
+        exit(0);
+    }
+    Sampler *sampler = samplers[index];
+    Bxdf *bxdf = bxdfs[index];
+    Texture *texture = textures[index];
+    Curve *curve = new BezierCurve(controls);
+    ResourceGroupMesh *group = new ResourceGroupMesh(
+        steps,
+        resolution,
+        *curve,
+        sampler,
+        bxdf,
+        texture
+    );
+    group->trans(T);
+    group_mesh.push_back(group);
+}
+
+void SceneParser::parse_bspline_curve(int current_index, Mat3 T) {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    get_token_expect(token, "{");
+    std::vector<Vec3> controls;
+    int index = current_index;
+    int steps = 40;
+    int resolution = 30;
+
+    while (true) {
+        get_token(token);
+        if (!strcmp(token, "controls")) {
+            get_token_expect(token, "{");
+            while(true) {
+                get_token(token);
+                if (!strcmp(token, "[")) {
+                    controls.push_back(read_vec3());
+                    get_token_expect(token, "]");
+                } else if(!strcmp(token, "}")) {
+                    break;
+                } else {
+                    fprintf(stderr, "Incorrect format for BsplineCurve!\n");
+                    exit(0);
+                }
+            }
+        } else if (!strcmp(token, "}")) {
+            break;
+        } else if (!strcmp(token, "MaterialIndex")) {
+            index = read_int();
+        } else if (!strcmp(token, "Steps")) {
+            steps = read_int();
+        } else if (!strcmp(token, "Resolution")) {
+            resolution = read_int();
+        } else {
+            fprintf(stderr, "Incorrect format for BsplineCurve!\n");
+            exit(0);
+        }
+    }
+    if(index < 0) {
+        fprintf(stderr, "No material found for BsplineCurve!\n");
+        exit(0);
+    }
+    Sampler *sampler = samplers[index];
+    Bxdf *bxdf = bxdfs[index];
+    Texture *texture = textures[index];
+    Curve *curve = new BsplineCurve(controls);
+    ResourceGroupMesh *group = new ResourceGroupMesh(
+        steps,
+        resolution,
+        *curve,
+        sampler,
+        bxdf,
+        texture
+    );
+    group->trans(T);
+    group_mesh.push_back(group);
+}
 
 
 

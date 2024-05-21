@@ -68,7 +68,7 @@ void Vec3::operator/=(const Vec3 &b) {
     x /= b.x, y /= b.y, z /= b.z;
 }
 /// return the cross product of a and b
-Vec3 Vec3::cross(const Vec3&b) {
+const Vec3 Vec3::cross(const Vec3&b) const {
     return Vec3(y * b.z - z * b.y,
                 z * b.x - x * b.z,
                 x * b.y - y * b.x);
@@ -86,7 +86,7 @@ float Vec3::dot(const Vec3 &b) const {
     return x * b.x + y * b.y + z * b.z;
 }
 
-Vec3 Vec3::norm() {
+const Vec3 Vec3::norm() const {
     float s = std::sqrt(x * x + y * y + z * z);
     return Vec3(x / s, y / s, z / s);
 }
@@ -98,7 +98,7 @@ void Vec3::normalize() {
     z /= s;
 }
 
-float Vec3::len() {
+const float Vec3::len() const {
     return std::sqrt(x * x + y * y + z * z);
 }
 

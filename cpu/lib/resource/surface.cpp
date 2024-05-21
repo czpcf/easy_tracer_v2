@@ -13,7 +13,19 @@ Surface::Surface(
     const Vec3 &_color,
     Bxdf *b,
     Sampler *s):
-    normal(_normal), x(_x), y(_y), color(_color), bxdf(b), sampler(s) {
+    normal(_normal), inter_normal(_normal), x(_x), y(_y), color(_color), bxdf(b), sampler(s) {
+    empty = false;
+}
+
+Surface::Surface(
+    const Vec3 &_normal,
+    const Vec3 &_inter_normal,
+    const Vec3 &_x,
+    const Vec3 &_y,
+    const Vec3 &_color,
+    Bxdf *b,
+    Sampler *s):
+    normal(_normal), inter_normal(_inter_normal), x(_x), y(_y), color(_color), bxdf(b), sampler(s) {
     empty = false;
 }
 
@@ -27,6 +39,10 @@ Sampler *Surface::get_sampler() {
 
 const Vec3 Surface::get_normal() const {
     return normal;
+}
+
+const Vec3 Surface::get_inter_normal() const {
+    return inter_normal;
 }
 
 const Vec3 Surface::get_x() const {

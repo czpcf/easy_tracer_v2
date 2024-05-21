@@ -27,7 +27,24 @@ class Surface {
 public:
     Surface();
     ~Surface() = default;
-    Surface(const Vec3 &_normal, const Vec3 &_x, const Vec3 &_y, const Vec3 &_color, Bxdf *b, Sampler *sampler);
+    Surface(
+        const Vec3 &_normal, 
+        const Vec3 &_x, 
+        const Vec3 &_y, 
+        const Vec3 &_color, 
+        Bxdf *b, 
+        Sampler *sampler
+    );
+
+    Surface(
+        const Vec3 &_normal, 
+        const Vec3 &_inter_normal, 
+        const Vec3 &_x, 
+        const Vec3 &_y, 
+        const Vec3 &_color, 
+        Bxdf *b, 
+        Sampler *sampler
+    );
 
     /// @brief return bxdf
     Bxdf *get_bxdf();
@@ -37,6 +54,9 @@ public:
 
     /// @brief return surface normal
     const Vec3 get_normal() const;
+
+    /// @brief return interpolated normal
+    const Vec3 get_inter_normal() const;
 
     /// @brief return x-axis
     const Vec3 get_x() const;
@@ -65,6 +85,7 @@ public:
 
 private:
     Vec3 normal;
+    Vec3 inter_normal;
     Vec3 x;
     Vec3 y;
     Vec3 color;

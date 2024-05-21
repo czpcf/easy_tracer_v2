@@ -29,7 +29,7 @@ public:
     const Vec3 operator*(const Vec3 &b) const;
 
     /// @brief return the cross product: a x b
-    Vec3 cross(const Vec3 &b);
+    const Vec3 cross(const Vec3 &b) const;
 
     /// @brief return x + y + z;
     float sum();
@@ -38,13 +38,13 @@ public:
     float dot(const Vec3 &b) const;
 
     /// @brief return the norm of this vector, errors will occur if the vector is 0
-    Vec3 norm();
+    const Vec3 norm() const;
 
     /// @brief normalize this vector, errors will occur if the vector is 0
     void normalize();
 
     /// @brief return the length of the vector, errors will occur if the vector is 0
-    float len();
+    const float len() const;
 
     /// @brief return the angle in radians between a and b, safely
     float angle(const Vec3 &b);

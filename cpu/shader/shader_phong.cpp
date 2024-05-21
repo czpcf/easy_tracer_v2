@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
                         Vec3 emittor = info_light->get_emittor();
 
                         // calculate color
-                        radiance += emittor * surface.get_bxdf()->phase(surface, suf_to_light, suf_to_eye, norm);
+                        radiance += emittor * surface.get_bxdf()->phase(surface, suf_to_light, suf_to_eye, surface.get_inter_normal());
                     }
                 }
                 

@@ -109,7 +109,7 @@ void AccelBVH::build_tree(uint l, uint r, uint &tot, RNGMT19937 &rng, uint dep) 
         return;
     }
     float cost_x = 1e30, cost_y = 1e30, cost_z = 1e30;
-    uint pos_x, pos_y, pos_z;
+    uint pos_x = 0, pos_y = 0, pos_z = 0;
     Box box = aux_boxes[l].first;
     for(uint i = l + 1; i < r; ++i) {
         box.add(aux_boxes[i].first);
