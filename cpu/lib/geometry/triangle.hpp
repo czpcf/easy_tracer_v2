@@ -58,6 +58,9 @@ public:
     /// @brief return interpolated norm according to local
     static const Vec3 interpolate_norm(const Vec3 &n1, const Vec3 &n2, const Vec3 &n3, const Vec2 &local);
 
+    /// @brief return interpolated uv according to local
+    static const UV interpolate_uv(const UV &u1, const UV &u2, const UV &u3, const Vec2 &local);
+
 private:
     /// @brief fast pre-calculation
     unsigned short type;

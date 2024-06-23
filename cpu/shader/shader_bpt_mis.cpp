@@ -457,7 +457,8 @@ Vec3 mc(
     if(radiance.have_bad() || radiance.min() < 0) {
         return Vec3(0.0f, 0.0f, 0.0f);
     }
-    return min(radiance, Vec3(20.0f, 20.0f, 20.0f));
+    return radiance;
+    // return min(radiance, Vec3(20.0f, 20.0f, 20.0f));
 }
 
 int main(int argc, char *argv[]) {

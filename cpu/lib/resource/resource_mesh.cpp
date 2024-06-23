@@ -22,10 +22,8 @@ ResourceTriangle::ResourceTriangle(
     texture(t) {}
 
 UV ResourceTriangle::local_to_uv(const Vec2 &local) {
-    float t1 = local.x;
-    float t3 = local.y;
-    float t2 = 1.0f - t1 - t3;
-    return uv1 * t1 + uv2 * t2 + uv3 * t3;
+    UV uv = Triangle::interpolate_uv(uv1, uv2, uv3, local);
+    return Triangle::interpolate_uv(uv1, uv2, uv3, local);
 }
 
 Surface ResourceTriangle::get_surface(const Vec2 &local) {
@@ -121,8 +119,9 @@ ResourceGroupMesh::ResourceGroupMesh(
                 n2 = normals[i.normal_index];
             }
             if(have_uvs) {
-                assert(0 <= i.texcoord_index && i.texcoord_index < uvs.size());
-                u2 = uvs[i.texcoord_index];
+                if(0 <= i.texcoord_index && i.texcoord_index < uvs.size()) {
+                    u2 = uvs[i.texcoord_index];
+                }
             }
             if(first == false) {
                 p0 = p2;
@@ -326,8 +325,9 @@ ResourceGroupMesh::ResourceGroupMesh(
                 n2 = smooth_norm[i.vertex_index].norm();
             }
             if(have_uvs) {
-                assert(0 <= i.texcoord_index && i.texcoord_index < uvs.size());
-                u2 = uvs[i.texcoord_index];
+                if(0 <= i.texcoord_index && i.texcoord_index < uvs.size()) {
+                    u2 = uvs[i.texcoord_index];
+                }
             }
             if(first == false) {
                 p0 = p2;

@@ -30,7 +30,7 @@ public:
 private:
     Triangle *triangle;
     Vec3 norm1, norm2, norm3;
-    Vec2 uv1, uv2, uv3;
+    UV uv1, uv2, uv3;
     Sampler *sampler;
     Bxdf *bxdf;
     Texture *texture;

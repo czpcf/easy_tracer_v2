@@ -12,41 +12,31 @@ Background {
     color 0 0 0 
 }
 
+Textures {
+    numTextures 1
+    path ./textures/tile1.png
+}
+
 Materials {
-    numMaterials 6
-    bxdfLambertian {
-        color 0.725 0.710 0.680
-    }
-    bxdfLambertian {
-        color 0.140 0.450 0.091
-    }
-    bxdfLambertian {
-        color 0.630 0.065 0.050
-    }
-    bxdfLambertian {
-        color 1.000 1.000 1.000
-    }
-    bxdfReflection {
-        color 1.0 1.0 1.0
-    }
-    bxdfRefraction {
-        refract 2.0
-        color 1.0 1.0 1.0
-    }
+    numMaterials 4
+    bxdfLambertian { texture 0 }
+    bxdfLambertian { color 0.140 0.450 0.091 }
+    bxdfLambertian { color 0.630 0.065 0.050 }
+    bxdfLambertian { color 1.000 1.000 1.000 }
 }
 
 Lights {
     numLights 2
     TriangularLight {
         MaterialIndex 3
-        emittor 34.0 24.0 8.0
+        emittor 17.0 12.0 4.0
         p0 -0.24 1.98 0.16
         p1 -0.24 1.98 -0.22
         p2 0.23 1.98 -0.22
     }
     TriangularLight {
         MaterialIndex 3
-        emittor 34.0 24.0 8.0
+        emittor 17.0 12.0 4.0
         p0 -0.24 1.98 0.16
         p1 0.23 1.98 -0.22
         p2 0.23 1.98 0.16
@@ -54,16 +44,11 @@ Lights {
 }
 
 Group {
-    numObjects 2
+    numObjects 1
     TriangleMesh {
         faceMaterial default 0
         faceMaterial f 3 1
         faceMaterial f 4 2
-        obj_file obj/cornellbox_empty.obj
-    }
-    MaterialIndex 5
-    Sphere {
-    	center 0.4 0.25 0
-        radius 0.25
+        obj_file obj/cornellbox_without_light.obj
     }
 }

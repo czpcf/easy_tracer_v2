@@ -1,0 +1,59 @@
+
+PerspectiveCamera {
+    center 0.4 1.995 5.0
+    direction 0 -0.2 -1
+    up 0 1 0
+    angle 27.28
+    width 1536
+    height 1024
+}
+
+Background {
+    color 0 0 0 
+}
+
+Materials {
+    numMaterials 4
+    bxdfRough {
+        alpha 10
+        color 0.6 0.6 0.6
+    }
+    bxdfLambertian { color 0.140 0.450 0.091 }
+    bxdfLambertian { color 0.630 0.065 0.050 }
+    bxdfLambertian { color 1.000 1.000 1.000 }
+}
+
+Lights {
+    numLights 2
+    TriangularLight {
+        MaterialIndex 3
+        emittor 17.0 12.0 4.0
+        p0 -1.54 0.36 -2
+        p1 1.46 0.36 -2
+        p2 1.46 1.44 -1.6
+    }
+
+    TriangularLight {
+        MaterialIndex 3
+        emittor 17.0 12.0 4.0
+        p0 -1.54 0.36 -2
+        p1 1.46 1.44 -1.6
+        p2 -1.54 1.44 -1.6
+    }
+    
+}
+
+Group {
+    numObjects 2
+    MaterialIndex 0
+    Triangle {
+        vertex0 -5 0.4 1
+        vertex1 -5 0.3 -2
+        vertex2 5 0.3 -2
+    }
+    Triangle {
+        vertex0 -5 0.4 1
+        vertex1 5 0.3 -2
+        vertex2 5 0.4 1
+    }
+}

@@ -13,9 +13,11 @@
 #include "bxdf/bxdf_gtr1.hpp"
 #include "bxdf/bxdf_lambertian.hpp"
 #include "bxdf/bxdf_phong.hpp"
+#include "bxdf/bxdf_rough.hpp"
 #include "bxdf/bxdf_specular.hpp"
 #include "bxdf/bxdf.hpp"
 
+#include "camera/camera_convex.hpp"
 #include "camera/camera_perspective.hpp"
 #include "camera/camera.hpp"
 
@@ -56,6 +58,7 @@
 #include "sampler/onb.hpp"
 #include "sampler/sampler_disney.hpp"
 #include "sampler/sampler_ggx.hpp"
+#include "sampler/sampler_glass.hpp"
 #include "sampler/sampler_gtr1.hpp"
 #include "sampler/sampler_lambertian.hpp"
 #include "sampler/sampler_reflection.hpp"

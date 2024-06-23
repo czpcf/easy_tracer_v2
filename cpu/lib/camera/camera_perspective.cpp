@@ -1,8 +1,5 @@
 #include "camera_perspective.hpp"
 
-#include<iostream>
-using namespace std;
-
 CameraPerspective::CameraPerspective(const Vec3 &eye, const Vec3 &direction, const Vec3 &up, int w, int h, float angle):
     Camera(eye, direction, up, w, h) {
     // make sure the vectors are normalized
@@ -14,7 +11,7 @@ CameraPerspective::CameraPerspective(const Vec3 &eye, const Vec3 &direction, con
     T_inv = Mat3::look_at_inv(this->eye, this->eye + this->direction, this->up);
 }
 
-Ray CameraPerspective::generate_ray(const Vec2 &uv) {
+Ray CameraPerspective::generate_ray(RNG *rng, const Vec2 &uv) {
     Vec3 p(0.0f, 0.0f, 0.0f);
     Vec3 d((cx - uv.x) * fx, (uv.y - cy) * fy, 1);
     d.normalize();
@@ -47,7 +44,7 @@ void CameraPerspective::sample_direction(RNG *rng, const Vec2 &local, Vec3 &dir,
 void CameraPerspective::sample_ray(int x, int y, RNG *rng, Ray &ray, float &pdf) {
     float dx = rng->rand_float();
     float dy = rng->rand_float();
-    Vec3 d((cx - x + dx) * fx, (y - cy + dy) * fy, 1);
+    Vec3 d((cx - float(x) + dx) * fx, (float(y) - cy + dy) * fy, 1);
     
     // float jacobian = d.square();
     // jacobian = jacobian * jacobian;
@@ -76,6 +73,7 @@ bool CameraPerspective::sample_in_ray(int x, int y, RNG *rng, const Vec3 &inter,
     }
     ray = Ray(inter, dir);
     pdf = -1.0f;
+    return true;
 }
 
 float CameraPerspective::pdf_point(const Vec3 &p_in_film) {

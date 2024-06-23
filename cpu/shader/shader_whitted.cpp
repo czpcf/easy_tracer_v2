@@ -1,11 +1,13 @@
-/*
-WARNING: this shader is not physically based
-because it does not consider the cosine term upon intersection
-*/
 #include <iostream>
 #include "../lib/easy_tracer_v2.hpp"
 
 using namespace std;
+
+const int MAX_DEPTH = 20;
+
+static Ray offset(const Ray &ray) {
+    return Ray(ray.get_origin() + ray.get_direction() * 0.00006103515625f, ray.get_direction());
+}
 
 int main(int argc, char *argv[]) {
     for (int argNum = 1; argNum < argc; ++argNum) {
@@ -32,9 +34,27 @@ int main(int argc, char *argv[]) {
 
     for(int x = 0; x < width; ++x) {
         for(int y = 0; y < height; ++y) {
-            Ray camRay = camera->generate_ray(&rng, Vec2(x, y));
+            Ray ray = camera->generate_ray(&rng, Vec2(x, y));
             RayHit hit;
-            if(accel->inter(camRay, hit)) {
+            bool hit_on_diffuse = false;
+            int depth = 0;
+            Vec3 g(1.0f, 1.0f, 1.0f);
+            while(accel->inter(ray, hit) && depth < MAX_DEPTH) {
+                auto info = parser.get_info(hit);
+                Surface surface = info->get_surface(hit.get_local());
+                if(surface.get_sampler()->is_specular()) {
+                    ++depth;
+                    Vec3 dir_out;
+                    float pdf;
+                    surface.get_sampler()->sample_out(surface, &rng, -ray.get_direction(), dir_out, pdf);
+                    ray = offset(Ray(hit.get_inter(ray), dir_out));
+                    g *= surface.get_color();
+                } else {
+                    hit_on_diffuse = true;
+                    break;
+                }
+            }
+            if(hit_on_diffuse) {
                 // only support point light and directional light
                 if(parser.is_light(hit)) {
                     continue;
@@ -42,7 +62,7 @@ int main(int argc, char *argv[]) {
                 auto info = parser.get_info(hit);
 
                 // get intersection on the surface
-                Vec3 inter = hit.get_inter(camRay);
+                Vec3 inter = hit.get_inter(ray);
 
                 // change local coordinate into uv coordinate
                 UV uv = info->local_to_uv(hit.get_local());
@@ -77,13 +97,18 @@ int main(int argc, char *argv[]) {
                         Vec3 suf_to_light = (p_light - inter).norm();
 
                         // direction from intersection to eye
-                        Vec3 suf_to_eye = -camRay.get_direction();
+                        Vec3 suf_to_eye = -ray.get_direction();
                         
+                        float rate = 1.0;
+                        if(accel->if_inter_dis(offset(Ray(inter, suf_to_light)), (suf_to_light - inter).len()*0.9999f)) {
+                            rate = 0.5;
+                        }
+
                         // get emittor
                         Vec3 emittor = info_light->get_emittor();
 
                         // calculate color
-                        radiance += emittor * surface.get_bxdf()->phase(surface, suf_to_light, suf_to_eye, surface.get_inter_normal());
+                        radiance += emittor * surface.get_bxdf()->phase(surface, suf_to_light, suf_to_eye, surface.get_inter_normal()) * rate;
                     }
                 }
                 
@@ -99,15 +124,20 @@ int main(int argc, char *argv[]) {
                         light->sample_in_ray(&rng, inter, ray_in, pdf, local);
                         Vec3 p_light = ray_in.get_origin();
                         Vec3 suf_to_light = (p_light - inter).norm();
-                        Vec3 suf_to_eye = -camRay.get_direction();
+                        Vec3 suf_to_eye = -ray.get_direction();
+                        
+                        float rate = 1.0;
+                        if(accel->if_inter_dis(offset(Ray(inter, suf_to_light)), 1000)) {
+                            rate = 0.5;
+                        }
+
                         Vec3 emittor = info_light->get_emittor();
-                        radiance += emittor * surface.get_bxdf()->phase(surface, suf_to_light, suf_to_eye, norm);
+                        radiance += emittor * surface.get_bxdf()->phase(surface, suf_to_light, suf_to_eye, norm) * rate;
                     }
                 }
 
-                Vec3 g = radiance;
                 // convert radiance to final color
-                image.set_pixel(x, y, radiance);
+                image.set_pixel(x, y, radiance * g);
             } else {
                 image.set_pixel(x, y, parser.get_background_color());
             }

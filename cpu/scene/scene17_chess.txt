@@ -1,0 +1,172 @@
+
+ConvexCamera {
+    center 5.13 3.4 -7.45
+    direction -0.6 -0.331 0.8
+    up 0 1 0
+    aperature 0.12
+    focus 0.33333
+    dis 0.3470076
+    scale 0.04
+    width 2560
+    height 1440
+}
+
+Background {
+    color 0.009 0.0017 0.0008
+}
+
+Textures {
+    numTextures 3
+    path ./textures/chessboard_plank_white.png
+    path ./textures/chessboard_plank_yellow.png
+    path ./textures/chess_king.png
+}
+
+Materials {
+    numMaterials 7
+    bxdfLambertian { color 1.000 1.000 1.000 }
+    bxdfLambertian { texture 0 }
+    bxdfLambertian { texture 1 }
+    bxdfLambertian { texture 2 }
+    bxdfGlass {
+        eta 1.2
+        bias 0.1
+        scale 0.9
+        power 5
+        color 0.95 0.98 1.0
+    }
+    
+    bxdfLambertian { color 1.000 1.000 1.000 }
+    bxdfLambertian { color 0.6 0.55 0.4 }
+}
+
+Lights {
+    numLights 2
+    TriangularLight {
+        MaterialIndex 0
+        emittor 4.0 4.1 4.1
+        p0 -4.0 10.0 -4.0
+        p1 4.0 10.0 -4.0
+        p2 4.0 10.0 4.0
+    }
+    TriangularLight {
+        MaterialIndex 0
+        emittor 4.0 4.1 4.1
+        p0 -4.0 10.0 -4.0
+        p1 4.0 10.0 4.0
+        p2 -4.0 10.0 4.0
+    }
+}
+
+Group {
+    numObjects 9
+    TriangleMesh {
+        faceMaterial default 1
+        faceMaterial f 1 2
+        faceMaterial f 3 2
+        faceMaterial f 5 2
+        faceMaterial f 7 2
+        faceMaterial f 8 2
+        faceMaterial f 10 2
+        faceMaterial f 12 2
+        faceMaterial f 14 2
+        faceMaterial f 17 2
+        faceMaterial f 19 2
+        faceMaterial f 21 2
+        faceMaterial f 23 2
+        faceMaterial f 24 2
+        faceMaterial f 26 2
+        faceMaterial f 28 2
+        faceMaterial f 30 2
+        faceMaterial f 33 2
+        faceMaterial f 35 2
+        faceMaterial f 37 2
+        faceMaterial f 39 2
+        faceMaterial f 40 2
+        faceMaterial f 42 2
+        faceMaterial f 44 2
+        faceMaterial f 46 2
+        faceMaterial f 49 2
+        faceMaterial f 51 2
+        faceMaterial f 53 2
+        faceMaterial f 55 2
+        faceMaterial f 56 2
+        faceMaterial f 58 2
+        faceMaterial f 60 2
+        faceMaterial f 62 2
+        faceMaterial f 64 2
+        obj_file obj/chessboard_bottom.obj
+    }
+    TriangleMesh {
+        faceMaterial default 4
+        obj_file obj/chessboard_glass.obj
+    }
+    Transform {
+        XRotate 180.0
+        YRotate -60.0
+		Scale 0.5 0.5 0.5
+		Translate 0.45 0 -0.6
+        TriangleMesh {
+            faceMaterial default 3
+            obj_file obj/chess_king.obj
+        }
+    }
+    Transform {
+        XRotate 180.0
+        YRotate -60.0
+        XRotate 93.5
+        YRotate 115.0
+		Scale 0.5 0.5 0.5
+		Translate -0.55 0.3 -1.4
+        TriangleMesh {
+            faceMaterial default 4
+            obj_file obj/chess_rook.obj
+        }
+    }
+    Transform {
+        XRotate 180.0
+        YRotate -60.0
+		Scale 0.5 0.5 0.5
+		Translate -0.42 0 -0.47
+        TriangleMesh {
+            faceMaterial default 5
+            obj_file obj/chess_pawn.obj
+        }
+    }
+    Transform {
+        XRotate 180.0
+		Scale 0.5 0.5 0.5
+		Translate -0.5 0 3.50
+        TriangleMesh {
+            faceMaterial default 6
+            obj_file obj/chess_pawn.obj
+        }
+    }
+    Transform {
+        XRotate 180.0
+		Scale 0.5 0.5 0.5
+		Translate -1.5 0 3.50
+        TriangleMesh {
+            faceMaterial default 6
+            obj_file obj/chess_pawn.obj
+        }
+    }
+    Transform {
+        XRotate 180.0
+		Scale 0.5 0.5 0.5
+		Translate -2.5 0 3.50
+        TriangleMesh {
+            faceMaterial default 6
+            obj_file obj/chess_pawn.obj
+        }
+    }
+    Transform {
+        XRotate 180.0
+		Scale 0.5 0.5 0.5
+		Translate -3.5 0 3.50
+        TriangleMesh {
+            faceMaterial default 6
+            obj_file obj/chess_pawn.obj
+        }
+    }
+}

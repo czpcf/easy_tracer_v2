@@ -1,13 +1,15 @@
-#ifndef CAMERA_PERSPECTIVE_H
-#define CAMERA_PERSPECTIVE_H
+#ifndef CAMERA_CONVEX_H
+#define CAMERA_CONVEX_H
 
 #include "camera.hpp"
 #include <cmath>
 
-class CameraPerspective: public Camera {
+class CameraConvex: public Camera {
 public:
-    CameraPerspective(const Vec3 &eye, const Vec3 &direction, const Vec3 &up, int w, int h, float angle);
-    virtual ~CameraPerspective() = default;
+    CameraConvex(const Vec3 &eye, const Vec3 &direction, const Vec3 &up, 
+        int w, int h,
+        float aperture, float focus, float dis, float scale);
+    virtual ~CameraConvex() = default;
     
     /// @brief return width
     int get_width();
@@ -53,10 +55,22 @@ public:
     const DirType dir_type() const override;
 
 private:
+    /// @brief aperture
+    float A;
+    /// @brief focus
+    float F;
+    /// @brief distance between the film and the lens
+    float D;
+    /// @brief 1/f = 1/d + 1/h
+    float H;
+    /// @brief scaling the film
+    float scale;
+    /// @brief magnitude = H/D
+    float mag;
     float cx;
     float cy;
-    float fx;
-    float fy;
+    float sx;
+    float sy;
     Mat3 T;
     Mat3 T_inv;
 };

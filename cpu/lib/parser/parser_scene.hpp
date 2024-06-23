@@ -11,6 +11,7 @@
 #include "../tensor/vec3.hpp"
 #include "../tensor/mat3.hpp"
 
+#include "../camera/camera_convex.hpp"
 #include "../camera/camera_perspective.hpp"
 #include "../camera/camera.hpp"
 
@@ -20,6 +21,7 @@
 #include "../bxdf/bxdf_gtr1.hpp"
 #include "../bxdf/bxdf_lambertian.hpp"
 #include "../bxdf/bxdf_phong.hpp"
+#include "../bxdf/bxdf_rough.hpp"
 #include "../bxdf/bxdf.hpp"
 
 #include "../geometry/curve.hpp"
@@ -45,12 +47,14 @@
 
 #include "../sampler/sampler_disney.hpp"
 #include "../sampler/sampler_ggx.hpp"
+#include "../sampler/sampler_glass.hpp"
 #include "../sampler/sampler_gtr1.hpp"
 #include "../sampler/sampler_lambertian.hpp"
 #include "../sampler/sampler_reflection.hpp"
 #include "../sampler/sampler_refraction.hpp"
 #include "../sampler/sampler.hpp"
 
+#include "../texture/texture_color.hpp"
 #include "../texture/texture_simple.hpp"
 #include "../texture/texture.hpp"
 
@@ -124,6 +128,7 @@ private:
 
     float degrees_to_radians(float);
     void parse_file();
+    void parse_convex_camera();
     void parse_perspective_camera();
     void parse_background();
     void parse_lights();
@@ -131,14 +136,17 @@ private:
     void parse_directional_light();
     void parse_global_light();
 
+    void parse_textures();
     void parse_materials();
     void parse_material_phong();
     void parse_bxdf_lambertian();
     void parse_bxdf_ggx();
+    void parse_bxdf_glass();
     void parse_bxdf_gtr1();
     void parse_bxdf_disney();
     void parse_bxdf_reflection();
     void parse_bxdf_refraction();
+    void parse_bxdf_rough();
 
     void parse_group(int current_index, Mat3 T);
     void parse_object(int current_index, Mat3 T, char token[MAX_PARSER_TOKEN_LENGTH]);
@@ -166,6 +174,7 @@ private:
     std::vector<Bxdf*> bxdfs;
     std::vector<Sampler*> samplers;
     std::vector<Texture*> textures;
+    std::vector<Texture*> textures_from_file;
 
     std::vector<ResourceGroupLightPoint*> group_light_point;
     std::vector<ResourceGroupLightDirection*> group_light_direction;

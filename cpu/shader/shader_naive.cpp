@@ -12,7 +12,7 @@ SceneParser parser;
 Accel *accel;
 
 const uint max_depth = 4;
-const uint samples = 128;
+const uint samples = 16;
 
 // offset the ray to prevent intersecting with the last face
 static Vec3 offset(const Vec3 &ori, const Vec3 &d) {
@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
             int id = omp_get_thread_num();
             for(int x = id; x < width; x += max_threads) {
                 for(int y = 0; y < height; ++y) {
-                    Ray camRay = camera->generate_ray(Vec2(rng.rand_float() + x, rng.rand_float() + y));
+                    Ray camRay = camera->generate_ray(&rng, Vec2(rng.rand_float() + x, rng.rand_float() + y));
                     Vec3 res = mc(camRay.get_origin(), camRay.get_direction(), &rng);
                     image.add_pixel(x, y, res);
                 }

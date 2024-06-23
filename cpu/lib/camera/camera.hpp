@@ -27,7 +27,7 @@ public:
     int get_height();
     
     /// @brief generate ray regardless of its pdf
-    virtual Ray generate_ray(const Vec2 &) = 0;
+    virtual Ray generate_ray(RNG *rng, const Vec2 &) = 0;
 
     /// @brief sample point in the pixel (x, y) on the film given the intersection on the shape, and set pdf,
     /// if pdf < 0, its delta distribution

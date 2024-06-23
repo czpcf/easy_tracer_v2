@@ -14,9 +14,10 @@ using namespace std;
 
 SceneParser parser;
 Accel *accel;
+Vec3 background;
 
-const uint max_depth = 5;
-const uint samples = 64;
+const uint max_depth = 14;
+const uint samples = 16;
 
 static Vec3 offset(const Vec3 &p, const Vec3 &d) {
     return p + d * 0.00006103515625f;
@@ -45,6 +46,7 @@ Vec3 mc(Vec3 ori, Vec3 dir, RNG *rng) {
         Ray ray(offset(ori, dir), dir);
         RayHit hit;
         if(!accel->inter(ray, hit)) {
+            radiance += background;
             break;
         }
 
@@ -59,7 +61,7 @@ Vec3 mc(Vec3 ori, Vec3 dir, RNG *rng) {
         if(parser.is_light(hit)) {
             auto info = parser.get_light_info(hit);
             Vec3 emittor = info->get_emittor();
-
+            
             if(info->get_light()->area_type() == AreaType::INFINITE) {
                 // do not support sampling method 1(because the light is infinitely large)
                 auto light = info->get_light();
@@ -89,7 +91,7 @@ Vec3 mc(Vec3 ori, Vec3 dir, RNG *rng) {
                     float pdf_A =
                         pdf_last_sampler * // pdf of sampling bxdf
                         fabs(normal_suf.dot(-dir)) * // jacobian of converting from sphere to manifold
-                        light->decaying(inter, ori); // decaying of radiance
+                        light->decaying(ori, inter); // decaying of radiance
                     
                     // for numerical precisions, some terms are cancelled out,
                     // check the light transport equation for details !
@@ -110,6 +112,7 @@ Vec3 mc(Vec3 ori, Vec3 dir, RNG *rng) {
             bxdf = surface.get_bxdf();
             sampler = surface.get_sampler();
         }
+        // nee
         // if the sampler is not specular
         // then it can sample light on this surface
         if(!sampler->is_specular()) {
@@ -129,9 +132,9 @@ Vec3 mc(Vec3 ori, Vec3 dir, RNG *rng) {
                 // nothing between light and intersection
 
                 
-                if(accel->if_inter_dis(offset(light_to_suf), (light_to_suf.get_origin() - inter).len() * 0.999f) == false) {
+                if(accel->if_inter_dis(offset(light_to_suf), (light_to_suf.get_origin() - inter).len() * 0.9999f) == false) {
                     // cosine on surface
-                    float cos_suf = fabs(light_to_suf.get_direction().dot(-surface.get_inter_normal()));
+                    float cos_suf = fabs(light_to_suf.get_direction().dot(-surface.get_normal()));
 
                     // NO cosine on light !
                     // because light may be point/directional;
@@ -160,7 +163,7 @@ Vec3 mc(Vec3 ori, Vec3 dir, RNG *rng) {
                             float pdf_bxdf =
                                 sampler->pdf(surface, -dir, -light_to_suf.get_direction()) * // sampling bxdf pdf
                                 cos_light * // jacobian
-                                light->decaying(inter, ori); // decaying of light
+                                light->decaying(inter, light_to_suf.get_origin()); // decaying of light
                             
                             float mis_weight = heuristic(pdf_light, pdf_bxdf);
 
@@ -183,28 +186,29 @@ Vec3 mc(Vec3 ori, Vec3 dir, RNG *rng) {
         }
         if(pdf_last_sampler > 0) {
             product_pdf *= pdf_last_sampler;
+            product_beta *= fabs(normal_suf.dot(dir_in)); // do not count when sampler is specular
+            
+            // russian roulette
+            float q = fmin(0.9f, fmax(0.9f - 0.2f * depth, 0.1f));
+            float r = rng->rand_float();
+            if(r >= q) {
+                break;
+            }
+            product_pdf = product_pdf * q;
         } else {
             product_pdf *= -pdf_last_sampler;
             pdf_last_sampler = 1e30; // convert to infinite continous pdf
         }
-        product_bxdf *= bxdf->phase(surface, dir_in, -dir, surface.get_inter_normal());
-        product_beta *= fabs(surface.get_inter_normal().dot(dir_in));
+        product_bxdf *= bxdf->phase(surface, dir_in, -dir, normal_suf);
 
         ori = inter;
         dir = dir_in;
-
-        // russian roulette
-        float q = fmin(0.9f, fmax(0.9f - 0.2f * depth, 0.05f));
-        float r = rng->rand_float();
-        if(r >= q) {
-            break;
-        }
-        product_pdf = product_pdf * q;
     }
     if(radiance.have_bad() || radiance.min() < 0) {
         return Vec3(0.0f, 0.0f, 0.0f);
     }
-    return min(radiance, Vec3(20.0f, 20.0f, 20.0f));
+    return radiance;
+    // return min(radiance, Vec3(20.0f, 20.0f, 20.0f));
 }
 
 int main(int argc, char *argv[]) {
@@ -212,17 +216,21 @@ int main(int argc, char *argv[]) {
         std::cout << "Argument " << argNum << " is: " << argv[argNum] << std::endl;
     }
 
-    if (argc != 3) {
-        cout << "Usage: <input scene file> <output bmp file>" << endl;
+    if (argc != 3 && argc != 4) {
+        cout << "Usage: <input scene file> <output bmp file> [samples]" << endl;
         return 1;
     }
     string inputFile = argv[1];
     string outputFile = argv[2];  // only bmp is allowed.
+    int now_samples = samples;
+    if(argc == 4) {
+        now_samples = atoi(argv[3]);
+    }
 
     parser.init(inputFile.c_str());
 
     Camera *camera = parser.get_camera();
-    Vec3 background = parser.get_background_color();
+    background = parser.get_background_color();
     int width = camera->get_width();
     int height = camera->get_height();
 
@@ -240,8 +248,8 @@ int main(int argc, char *argv[]) {
         rng[i].init(i);
     }
 
-    for(int t = 0; t < samples; ++t) {
-        fprintf(stderr, "samples: [%d/%d]\r", t, samples);
+    for(int t = 0; t < now_samples; ++t) {
+        fprintf(stderr, "samples: [%d/%d]\r", t, now_samples);
         #pragma omp parallel
         {
             int id = omp_get_thread_num();
@@ -256,9 +264,9 @@ int main(int argc, char *argv[]) {
             }
         }
     }
-    cout << "samples: [" << samples << "/" << samples << "]\r";
+    cout << "samples: [" << now_samples << "/" << now_samples << "]\r";
     cout << endl << "ok done" << endl;
-    image.divide_by(samples);
+    image.divide_by(now_samples);
 
     // optional, better visual results
     image.linear_to_srgb();

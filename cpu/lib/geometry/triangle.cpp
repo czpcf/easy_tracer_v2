@@ -318,3 +318,11 @@ const Vec3 Triangle::interpolate_norm(const Vec3 &n1, const Vec3 &n2, const Vec3
     float c2 = 1.0f - c1 - c3;
     return n3 * c1 + n1 * c2 + n2 * c3;
 }
+
+const UV Triangle::interpolate_uv(const UV &u1, const UV &u2, const UV &u3, const Vec2 &local) {
+    float c1 = local.x;
+    float c3 = local.y;
+    float c2 = 1.0f - c1 - c3;
+    return UV(u3.x * c1 + u1.x * c2 + u2.x * c3,
+              u3.y * c1 + u1.y * c2 + u2.y * c3);
+}

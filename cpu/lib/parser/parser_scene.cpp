@@ -61,12 +61,16 @@ void SceneParser::parse_file() {
     while (get_token(token)) {
         if (!strcmp(token, "PerspectiveCamera")) {
             parse_perspective_camera();
+        } else if (!strcmp(token, "ConvexCamera")) {
+            parse_convex_camera();
         } else if (!strcmp(token, "Background")) {
             parse_background();
         } else if (!strcmp(token, "Lights")) {
             parse_lights();
         } else if (!strcmp(token, "Materials")) {
             parse_materials();
+        } else if (!strcmp(token, "Textures")) {
+            parse_textures();
         } else if (!strcmp(token, "Group")) {
             parse_group(-1, Mat3::id());
         } else {
@@ -155,6 +159,34 @@ void SceneParser::parse_perspective_camera() {
     camera = new CameraPerspective(center, direction, up, width, height, angle_radians);
 }
 
+void SceneParser::parse_convex_camera() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    // read in the camera parameters
+    get_token_expect(token, "{");
+    get_token_expect(token, "center");
+    Vec3 center = read_vec3();
+    get_token_expect(token, "direction");
+    Vec3 direction = read_vec3();
+    get_token_expect(token, "up");
+    Vec3 up = read_vec3();
+    get_token_expect(token, "aperature");
+    float aperature = read_float();
+    get_token_expect(token, "focus");
+    float focus = read_float();
+    get_token_expect(token, "dis");
+    float dis = read_float();
+    get_token_expect(token, "scale");
+    float scale = read_float();
+    get_token_expect(token, "width");
+    int width = read_int();
+    get_token_expect(token, "height");
+    int height = read_int();
+    get_token_expect(token, "}");
+    camera = new CameraConvex(
+        center, direction, up, width, height,
+        aperature, focus, dis, scale);
+}
+
 void SceneParser::parse_background() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     // read in the background color
@@ -194,6 +226,8 @@ void SceneParser::parse_materials() {
             parse_bxdf_lambertian();
         } else if (strcmp(token, "bxdfGGX") == 0) {
             parse_bxdf_ggx();
+        } else if (strcmp(token, "bxdfGlass") == 0) {
+            parse_bxdf_glass();
         } else if (strcmp(token, "bxdfGTR1") == 0) {
             parse_bxdf_gtr1();
         } else if (strcmp(token, "bxdfDisney") == 0) {
@@ -202,8 +236,36 @@ void SceneParser::parse_materials() {
             parse_bxdf_reflection();
         } else if (strcmp(token, "bxdfRefraction") == 0) {
             parse_bxdf_refraction();
+        } else if (strcmp(token, "bxdfRough") == 0) {
+            parse_bxdf_rough();
         } else {
             printf("Unknown token in parseMaterial: '%s'\n", token);
+            exit(0);
+        }
+        count++;
+    }
+    get_token_expect(token, "}");
+}
+
+void SceneParser::parse_textures() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    get_token_expect(token, "{");
+    // read in the number of objects
+    get_token_expect(token, "numTextures");
+    int n_textures = read_int();
+    
+    textures.reserve(n_textures);
+    
+    // read in the objects
+    int count = 0;
+    while (n_textures > count) {
+        get_token(token);
+        if (strcmp(token, "path") == 0) {
+            get_token(token);
+            TextureColor *texture = new TextureColor(token);
+            textures_from_file.push_back(texture);
+        }  else {
+            printf("Unknown token in parse_textures: '%s'\n", token);
             exit(0);
         }
         count++;
@@ -217,6 +279,7 @@ void SceneParser::parse_material_phong() {
     filename[0] = 0;
     Vec3 diffuseColor(1, 1, 1), specularColor(0, 0, 0);
     float shininess = 0;
+    int texture_id = -1;
     get_token_expect(token, "{");
     while (true) {
         get_token(token);
@@ -228,7 +291,7 @@ void SceneParser::parse_material_phong() {
             shininess = read_float();
         } else if (strcmp(token, "texture") == 0) {
             // Optional: read in texture and draw it.
-            get_token(filename);
+            texture_id = read_int();
         } else {
             assert (!strcmp(token, "}"));
             break;
@@ -239,15 +302,26 @@ void SceneParser::parse_material_phong() {
     auto *texture = new TextureSimple(Vec3(1.0f, 1.0f, 1.0f));
     bxdfs.push_back(bxdf);
     samplers.push_back(sampler);
-    textures.push_back(texture);
+    if(texture_id != -1) {
+        textures.push_back(textures_from_file[texture_id]);
+    } else {
+        textures.push_back(texture);
+    }
 }
 
 void SceneParser::parse_bxdf_lambertian() {
     char token[MAX_PARSER_TOKEN_LENGTH];
     char filename[MAX_PARSER_TOKEN_LENGTH];
     filename[0] = 0;
+    Vec3 color;
+    int texture_id = -1;
     get_token_expect(token, "{");
-    Vec3 color = read_vec3();
+    get_token(token);
+    if (strcmp(token, "color") == 0) {
+        color = read_vec3();
+    } else if (strcmp(token, "texture") == 0) {
+        texture_id = read_int();
+    }
     get_token_expect(token, "}");
 
     auto *bxdf = new BxdfLambertian();
@@ -255,7 +329,11 @@ void SceneParser::parse_bxdf_lambertian() {
     auto *texture = new TextureSimple(color);
     bxdfs.push_back(bxdf);
     samplers.push_back(sampler);
-    textures.push_back(texture);
+    if(texture_id != -1) {
+        textures.push_back(textures_from_file[texture_id]);
+    } else {
+        textures.push_back(texture);
+    }
 }
 
 void SceneParser::parse_bxdf_ggx() {
@@ -275,6 +353,32 @@ void SceneParser::parse_bxdf_ggx() {
 
     auto *bxdf = new BxdfGGX(roughness, alpha_x, alpha_y);
     auto *sampler = new SamplerGGX(roughness, alpha_x, alpha_y);
+    // auto *sampler = new SamplerLambertian();
+    auto *texture = new TextureSimple(color);
+    bxdfs.push_back(bxdf);
+    samplers.push_back(sampler);
+    textures.push_back(texture);
+}
+
+void SceneParser::parse_bxdf_glass() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    char filename[MAX_PARSER_TOKEN_LENGTH];
+    filename[0] = 0;
+    get_token_expect(token, "{");
+    get_token_expect(token, "eta");
+    float eta = read_float();
+    get_token_expect(token, "bias");
+    float bias = read_float();
+    get_token_expect(token, "scale");
+    float scale = read_float();
+    get_token_expect(token, "power");
+    float power = read_float();
+    get_token_expect(token, "color");
+    Vec3 color = read_vec3();
+    get_token_expect(token, "}");
+
+    auto *bxdf = new BxdfSpecular();
+    auto *sampler = new SamplerGlass(eta, bias, scale, power);
     auto *texture = new TextureSimple(color);
     bxdfs.push_back(bxdf);
     samplers.push_back(sampler);
@@ -288,8 +392,14 @@ void SceneParser::parse_bxdf_gtr1() {
     get_token_expect(token, "{");
     get_token_expect(token, "alpha");
     float alpha = read_float();
-    get_token_expect(token, "color");
-    Vec3 color = read_vec3();
+    Vec3 color;
+    get_token(token);
+    int texture_id = -1;
+    if (strcmp(token, "color") == 0) {
+        color = read_vec3();
+    } else if (strcmp(token, "texture") == 0) {
+        texture_id = read_int();
+    }
     get_token_expect(token, "}");
 
     if(alpha >= 1.0) {
@@ -298,10 +408,15 @@ void SceneParser::parse_bxdf_gtr1() {
 
     auto *bxdf = new BxdfGTR1(alpha);
     auto *sampler = new SamplerGTR1(alpha);
+    // auto *sampler = new SamplerLambertian();
     auto *texture = new TextureSimple(color);
     bxdfs.push_back(bxdf);
     samplers.push_back(sampler);
-    textures.push_back(texture);
+    if(texture_id != -1) {
+        textures.push_back(textures_from_file[texture_id]);
+    } else {
+        textures.push_back(texture);
+    }
 }
 
 void SceneParser::parse_bxdf_disney() {
@@ -309,8 +424,16 @@ void SceneParser::parse_bxdf_disney() {
     char filename[MAX_PARSER_TOKEN_LENGTH];
     filename[0] = 0;
     get_token_expect(token, "{");
-    get_token_expect(token, "color");
-    Vec3 color = read_vec3();
+    get_token(token);
+    Vec3 color;
+    int texture_id = -1;
+    if (strcmp(token, "color") == 0) {
+        color = read_vec3();
+    } else if (strcmp(token, "texture") == 0) {
+        texture_id = read_int();
+    } else {
+        assert(0);
+    }
     get_token_expect(token, "metallic");
     float metallic = read_float();
     get_token_expect(token, "subsurface");
@@ -363,7 +486,11 @@ void SceneParser::parse_bxdf_disney() {
     auto *texture = new TextureSimple(color);
     bxdfs.push_back(bxdf);
     samplers.push_back(sampler);
-    textures.push_back(texture);
+    if(texture_id != -1) {
+        textures.push_back(textures_from_file[texture_id]);
+    } else {
+        textures.push_back(texture);
+    }
 }
 
 void SceneParser::parse_bxdf_reflection() {
@@ -400,6 +527,35 @@ void SceneParser::parse_bxdf_refraction() {
     bxdfs.push_back(bxdf);
     samplers.push_back(sampler);
     textures.push_back(texture);
+}
+
+void SceneParser::parse_bxdf_rough() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    char filename[MAX_PARSER_TOKEN_LENGTH];
+    filename[0] = 0;
+    Vec3 color;
+    int texture_id = -1;
+    get_token_expect(token, "{");
+    get_token_expect(token, "alpha");
+    float alpha = read_float();
+    get_token(token);
+    if (strcmp(token, "color") == 0) {
+        color = read_vec3();
+    } else if (strcmp(token, "texture") == 0) {
+        texture_id = read_int();
+    }
+    get_token_expect(token, "}");
+
+    auto *bxdf = new BxdfRough(alpha);
+    auto *sampler = new SamplerLambertian();
+    auto *texture = new TextureSimple(color);
+    bxdfs.push_back(bxdf);
+    samplers.push_back(sampler);
+    if(texture_id != -1) {
+        textures.push_back(textures_from_file[texture_id]);
+    } else {
+        textures.push_back(texture);
+    }
 }
 
 int SceneParser::get_num_materials() {

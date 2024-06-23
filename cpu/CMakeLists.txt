@@ -17,8 +17,10 @@ set(SOURCE_FILES
     lib/bxdf/bxdf_gtr1.cpp
     lib/bxdf/bxdf_lambertian.cpp
     lib/bxdf/bxdf_phong.cpp
+    lib/bxdf/bxdf_rough.cpp
     lib/bxdf/bxdf_specular.cpp
     lib/bxdf/bxdf.cpp
+    lib/camera/camera_convex.cpp
     lib/camera/camera_perspective.cpp
     lib/camera/camera.cpp
     lib/geometry/curve.cpp
@@ -53,6 +55,7 @@ set(SOURCE_FILES
     lib/sampler/onb
     lib/sampler/sampler_disney.cpp
     lib/sampler/sampler_ggx.cpp
+    lib/sampler/sampler_glass.cpp
     lib/sampler/sampler_gtr1.cpp
     lib/sampler/sampler_lambertian.cpp
     lib/sampler/sampler_reflection.cpp
@@ -62,6 +65,7 @@ set(SOURCE_FILES
     lib/tensor/vec2.cpp
     lib/tensor/vec3.cpp
     lib/tensor/vec4.cpp
+    lib/texture/texture_color.cpp
     lib/texture/texture_simple.cpp
     lib/texture/texture.cpp
 )
@@ -102,5 +106,11 @@ target_link_libraries(shader_nee PRIVATE easy_tracer_v2_lib)
 add_executable(shader_forward_mis shader/shader_forward_mis.cpp)
 target_link_libraries(shader_forward_mis PRIVATE easy_tracer_v2_lib)
 
+add_executable(shader_smooth_forward_mis shader/shader_smooth_forward_mis.cpp)
+target_link_libraries(shader_smooth_forward_mis PRIVATE easy_tracer_v2_lib)
+
 add_executable(shader_bpt_mis shader/shader_bpt_mis.cpp)
 target_link_libraries(shader_bpt_mis PRIVATE easy_tracer_v2_lib)
+
+add_executable(shader_whitted shader/shader_whitted.cpp)
+target_link_libraries(shader_whitted PRIVATE easy_tracer_v2_lib)

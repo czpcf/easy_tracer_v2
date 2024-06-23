@@ -14,17 +14,17 @@ Background {
 
 Materials {
     numMaterials 4
-    bxdfLambertian { 0.725 0.710 0.680 }
-    bxdfLambertian { 0.140 0.450 0.091 }
-    bxdfLambertian { 0.630 0.065 0.050 }
-    bxdfLambertian { 1.000 1.000 1.000 }
+    bxdfLambertian { color 0.725 0.710 0.680 }
+    bxdfLambertian { color 0.140 0.450 0.091 }
+    bxdfLambertian { color 0.630 0.065 0.050 }
+    bxdfLambertian { color 1.000 1.000 1.000 }
 }
 
 Lights {
     numLights 2
     TriangularLight {
         MaterialIndex 3
-        emittor 17.0 12.0 4.0
+        emittor 68.0 46.0 16.0
         p0 -0.24 1.98 0.16
         p1 0.23 1.98 -0.22
         p2 -0.24 1.98 -0.22

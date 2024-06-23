@@ -1,9 +1,12 @@
 
-PerspectiveCamera {
+ConvexCamera {
     center -0.01 0.995 5.0
     direction 0 0 -1
     up 0 1 0
-    angle 27.28
+    aperature 0.12
+    focus 0.318182
+    dis 0.333333
+    scale 0.08
     width 1024
     height 1024
 }
@@ -25,25 +28,30 @@ Lights {
     TriangularLight {
         MaterialIndex 3
         emittor 17.0 12.0 4.0
-        p0 -0.24 1.98 0.16
-        p1 -0.24 1.98 -0.22
-        p2 0.23 1.98 -0.22
+        p0 -0.24 1.98 -3.16
+        p1 -0.24 1.98 -4.22
+        p2 0.23 1.98 -4.22
     }
     TriangularLight {
         MaterialIndex 3
         emittor 17.0 12.0 4.0
-        p0 -0.24 1.98 0.16
-        p1 0.23 1.98 -0.22
-        p2 0.23 1.98 0.16
+        p0 -0.24 1.98 -3.16
+        p1 0.23 1.98 -4.22
+        p2 0.23 1.98 -3.16
     }
 }
 
 Group {
-    numObjects 1
+    numObjects 2
     TriangleMesh {
         faceMaterial default 0
         faceMaterial f 3 1
         faceMaterial f 4 2
-        obj_file obj/cornellbox_without_light.obj
+        obj_file obj/long_box.obj
+    }
+    MaterialIndex 1
+    Sphere {
+	center 0.3 0.5 -2.8
+        radius 0.5
     }
 }

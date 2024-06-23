@@ -1,0 +1,46 @@
+# The MODIFIED Cornell Box in OBJ format.
+# Do not have light or boxes.
+# Note that the real box is not a perfect cube, so
+# the faces are imperfect in this data set.
+#
+# Created by Guedis Cardenas and Morgan McGuire at Williams College, 2011
+# Released into the Public Domain.
+#
+# http://graphics.cs.williams.edu/data
+# http://www.graphics.cornell.edu/online/box/data.html
+#
+
+g floor
+v  -1.01  0.00   0.99
+v   1.00  0.00   0.99
+v   1.00  0.00  -7.04
+v  -0.99  0.00  -7.04
+f -4 -3 -2 -1
+
+g ceiling
+v  -1.02  1.99   0.99
+v  -1.02  1.99  -7.04
+v   1.00  1.99  -7.04
+v   1.00  1.99   0.99
+f -4 -3 -2 -1
+
+g backWall
+v  -0.99  0.00  -7.04
+v   1.00  0.00  -7.04
+v   1.00  1.99  -7.04
+v  -1.02  1.99  -7.04
+f -4 -3 -2 -1
+
+g rightWall
+v	1.00  0.00  -7.04
+v	1.00  0.00   0.99
+v	1.00  1.99   0.99
+v	1.00  1.99  -7.04
+f -4 -3 -2 -1
+
+g leftWall
+v  -1.01  0.00   0.99
+v  -0.99  0.00  -7.04
+v  -1.02  1.99  -7.04
+v  -1.02  1.99   0.99
+f -4 -3 -2 -1
